@@ -31,6 +31,11 @@ sleep(2)
 browser.get(url='https://m.weibo.cn/')
 sleep(40)
 print(browser.get_cookies())
+
+
+
+
+
 # elem=browser.find_element_by_class_name('btn btnWhite')
 # elem.click()
 # username=browser.find_element_by_id('loginName')
