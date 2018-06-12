@@ -18,22 +18,6 @@ sql = "USE python;"
 cursor.execute(sql)
 connection.commit()
 
-# def cookie_get():
-#     #保存cookie到文件
-#     filecook='cookie.txt'
-#     # 声明一个MozillaCookieJar对象实例来保存cookie，之后写入文件
-#     cookie=cookiejar.MozillaCookieJar(filecook)
-#     # 利用urllib.request库的HTTPCookieProcessor对象来创建cookie处理器,也就CookieHandler
-#     handler=request.HTTPCookieProcessor(cookie)
-#     # 通过CookieHandler创建opener
-#     opener=request.build_opener(handler)
-#     res=opener.open('https://book.douban.com/')
-#     # ignore_discard的意思是即使cookies将被丢弃也将它保存下来；
-#     # ignore_expires的意思是如果在该文件中cookies已经存在，则覆盖原文件写入
-#     cookie.save(ignore_discard=True,ignore_expires=True)
-
-
-
 def login(url):
 # 文件中获取cookie并访问
     cookies={}
