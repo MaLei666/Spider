@@ -38,19 +38,26 @@ class comicspider(scrapy.Spider):
             item['title']=titles[i].replace(' ','').replace('\n','')
             item['url']=urls[i]
             items.append(item)
-            print(items[i])
+        # print(items)
         for item in items:
-            yield scrapy.Request(url=item['url'],meta={'item':item},callback=self.parse2)
+            # request的地址和allow_domain里面的冲突，从而被过滤掉。可以停用过滤功能。
+            yield scrapy.Request(url=item['url'],meta={'item':item},callback=self.parse2,dont_filter=True)
 
     def parse2(self, response):
         item=response.meta['item']
         item['url']=response.url
-
-        print(item['url'])
         hxs=Selector(response)
-        text=hxs.xpath('//article/text()').extract()
-        item['text']=text[0]
-        print(item['text'])
+        texts=hxs.xpath("//div[@id='article_content']//text()").extract()
+        turn = []
+        for each in texts:
+            each=each.replace('\n','').replace(' ','').replace('\xa0','')
+            turn.append(each)
+        for i in turn:
+            if i=='':
+                turn.remove(i)
+            # text=str(texts).replace('\n','').replace(' ','')
+            item['text']=str(turn)
+        # print(item['text'])
         yield item
 
 
