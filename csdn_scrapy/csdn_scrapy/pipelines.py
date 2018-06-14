@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from csdn_scrapy import settings
-from scrapy import Request
-import requests,os
+import os
 # Define your item pipelines here
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
@@ -9,7 +8,7 @@ import requests,os
 
 
 class CsdnScrapyPipeline(object):
-    def process_item(self, item, spider):
+    def process_item(self, item):
         if 'text' in item:
             # text=item['text']
             # dir_path='%s/%s'%(settings.ARTICLE_STORE,item['title'])
