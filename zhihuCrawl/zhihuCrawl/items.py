@@ -22,6 +22,9 @@ class UserinfoItem(scrapy.Item):
     education=scrapy.Field()
 
 class RelatinoItem(scrapy.Item):
-    user_id
+    user_id=scrapy.Field()
+    relation_type=scrapy.Field()
+    relation_id=scrapy.Field()
+
 
 
