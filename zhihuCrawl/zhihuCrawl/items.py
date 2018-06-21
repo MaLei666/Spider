@@ -12,7 +12,7 @@ class UserinfoItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     user_id=scrapy.Field()
-    user_img=scrapy.Field()
+    # user_img=scrapy.Field()
     name=scrapy.Field()
     location=scrapy.Field()
     business=scrapy.Field()
