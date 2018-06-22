@@ -4,6 +4,8 @@ from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 from requests_toolbelt import MultipartEncoder
 from hashlib import sha1
+from zhihuCrawl.items import ZhihuScrapyItem
+from scrapy import Selector
 
 
 class ZhihuComSpider(scrapy.Spider):
@@ -129,26 +131,62 @@ class ZhihuComSpider(scrapy.Spider):
             url=post_url,
             formdata=post_data,
             headers=headers,
-            callback=self.check_login
+            callback=self.hotres_url
         )
 
-    def check_login(self,response):
+    def hotres_url(self,response):
         # if len(json.loads(response.text)['refresh_token']) != 0:
-        text_json=json.loads(response.text)
+        # text_json=json.loads(response.text)
         # print(text_json)
-        yield scrapy.Request('https://www.zhihu.com/people/wu-di-zui-jun-mei/activities', headers=self.headers,callback=self.user_info)
+        page=0
+        for i in range(0,20):
+            url='''https://www.zhihu.com/node/ExploreAnswerListV2?params={"offset":''' + str(page)+''',"type":"day"}'''
+            yield scrapy.Request(url=url, headers=self.headers,callback=self.que_cont)
+            page += 5
+            print(url)
 
-    def user_info(self,response):
+    def que_cont(self,response):
         # text=response.text
         # print(text)
-        name=response.xpath("//span[@class='ProfileHeader-name']").extract()
-        print(name)
-        location = response.xpath("//span[@class='ProfileHeader-name']").extract()
-        business = response.xpath("//span[@class='ProfileHeader-name']").extract()
-        gender = response.xpath("//span[@class='ProfileHeader-name']").extract()
-        employment = response.xpath("//span[@class='ProfileHeader-name']").extract()
-        position = response.xpath("//span[@class='ProfileHeader-name']").extract()
-        education = response.xpath("//span[@class='ProfileHeader-name']").extract()
+        items=[]
+        contents = []
+        questions=response.xpath("//a[@class='question_link']//text()").extract()
+        que_urls=response.xpath("//a[@class='question_link']//@href").extract()
+        # https: // www.zhihu.com
+        names=response.xpath("//a[@class='author-link']//text()").extract()
+        # print(names)
+        nums=response.xpath("//a[@class='zm-item-vote-count js-expand js-vote-count']/text()").extract()
+
+        # 因为格式问题，每条回答单独提出
+        # 内容所在标签
+        info=response.xpath("//div[@class='zh-summary summary clearfix']")
+        # 使用string（.）方法提取标签内所有文字，与text（）方法不同的是，text方法提取出来的以不同元素存在于列表中，string方法则存在于同一个元素中
+        texts=info.xpath('string(.)').extract()
+        # print(texts)
+        for each in texts:
+            each=each.replace(' ','').replace('显示全部','').replace('\n','')
+            contents.append(each)
+        for i in contents:
+            if i == '':
+                contents.remove(i)
+        # print(questions,que_urls,names,contents,nums)
+
+        for i in range(0,5):
+            item=ZhihuScrapyItem()
+            item['question']=questions[i].replace(' ','').replace('\n','')
+            item['que_url']='https://www.zhihu.com'+que_urls[i]
+            item['name']=names[i]
+            item['content']=contents[i]
+            item['num']=nums[i]
+            items.append(item)
+        print(items)
+        for item in items:
+            # request的地址和allow_domain里面的冲突，从而被过滤掉。可以停用过滤功能。
+            print(item)
+
+
+
+
 
 
 
