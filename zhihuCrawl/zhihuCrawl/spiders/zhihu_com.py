@@ -143,7 +143,7 @@ class ZhihuComSpider(scrapy.Spider):
             url='''https://www.zhihu.com/node/ExploreAnswerListV2?params={"offset":''' + str(page)+''',"type":"day"}'''
             yield scrapy.Request(url=url, headers=self.headers,callback=self.que_cont)
             page += 5
-            print(url)
+            # print(url)
 
     def que_cont(self,response):
         # text=response.text
@@ -179,10 +179,11 @@ class ZhihuComSpider(scrapy.Spider):
             item['content']=contents[i]
             item['num']=nums[i]
             items.append(item)
-        print(items)
-        for item in items:
-            # request的地址和allow_domain里面的冲突，从而被过滤掉。可以停用过滤功能。
-            print(item)
+            yield item
+
+        # for item in items:
+        #     # request的地址和allow_domain里面的冲突，从而被过滤掉。可以停用过滤功能。
+        #     print(item)
 
 
 
