@@ -7,7 +7,7 @@ from csdn_scrapy.items import CsdnScrapyItem
 class comicspider(scrapy.Spider):
     # 自己定义的内容，在运行工程的时候需要用到的标识；
     # 用于区别Spider。该名字必须是唯一的，不可以为不同的Spider设定相同的名字。
-    name = 'comic'
+    name = 'csdn.com'
 
     def __init__(self):
         # 允许爬虫访问的域名，防止爬虫跑飞
@@ -41,7 +41,7 @@ class comicspider(scrapy.Spider):
         for item in items:
             # request的地址和allow_domain里面的冲突，从而被过滤掉。可以停用过滤功能。
             yield scrapy.Request(url=item['url'],meta={'item':item},callback=self.parse2,dont_filter=True)
-
+    # 进入链接保存文章内容
     def parse2(self, response):
         item=response.meta['item']
         item['url']=response.url
@@ -55,7 +55,7 @@ class comicspider(scrapy.Spider):
             if i=='':
                 turn.remove(i)
             # text=str(texts).replace('\n','').replace(' ','')
-            item['text']=str(turn)
+        item['text']=str(turn)
         # print(item['text'])
         yield item
 
