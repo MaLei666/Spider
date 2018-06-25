@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
 from urllib.parse import urlencode
 import requests,pymysql
 from pyquery import PyQuery as pq
