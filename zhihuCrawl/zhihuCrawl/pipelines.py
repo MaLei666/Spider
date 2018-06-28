@@ -40,3 +40,7 @@ class ZhihucrawlPipeline(object):
         return item
 
 
+from pymongo import MongoClient
+
+client=MongoClient("mongodb://127.0.0.1:27017,127.0.0.1:27021,127.0.0.1:27022",replicaset='repset')
+print( client.python.find_one())
