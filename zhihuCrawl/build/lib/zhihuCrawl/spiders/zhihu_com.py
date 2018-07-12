@@ -9,7 +9,7 @@ from scrapy import Selector
 
 
 class ZhihuComSpider(scrapy.Spider):
-    name = 'zhihu.com'
+    name = 'zhihu'
     allowed_domains = ['zhihu.com']
     start_urls = ['http://zhihu.com/']
 
@@ -56,7 +56,7 @@ class ZhihuComSpider(scrapy.Spider):
         print(need_cap)
         if need_cap:
             print('需要验证码')
-            yield scrapy.Request(url='https://www.zhihu.com/api/v3/oauth/captcha?lang=en',headers=self.headers,callback=self.capture,method='PUT')
+            yield scrapy.Request('https://www.zhihu.com/api/v3/oauth/captcha?lang=en',headers=self.headers,callback=self.capture,method='PUT')
 
         else:
             print('不需要验证码')
@@ -74,7 +74,7 @@ class ZhihuComSpider(scrapy.Spider):
                 'lang':'en',
                 'ref_source':'other_',
                 'utm_source':''}
-            yield scrapy.FormRequest(url=post_url,formdata=post_data,headers=self.headers,callback=self.check_login)
+            yield scrapy.FormRequest(url=post_url,formdata=post_data,headers=self.headers)
 
     def capture(self,response):
         try:

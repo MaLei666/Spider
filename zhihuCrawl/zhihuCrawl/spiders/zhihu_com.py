@@ -9,7 +9,7 @@ from scrapy import Selector
 
 
 class ZhihuComSpider(scrapy.Spider):
-    name = 'zhihu.com'
+    name = 'zhihu'
     allowed_domains = ['zhihu.com']
     start_urls = ['http://zhihu.com/']
 

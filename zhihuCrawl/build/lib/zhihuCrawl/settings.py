@@ -65,7 +65,8 @@ COOKIES_ENABLED = True
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'zhihuCrawl.pipelines.ZhihucrawlPipeline': 300,
+   'zhihuCrawl.pipelines.ZhihucrawlPipeline': 300
+   # 'scrapy_redis.pipelines.RedisPipeline': 301
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -97,3 +98,18 @@ MONGODB_PORT = 27017
 MONGODB_DBNAME = "python"
 # 存放数据的表名称
 MONGODB_SHEETNAME = "python"
+
+# #使用scrapy_redis的调度器:
+# SCHEDULER="scrapy_redis.scheduler.Scheduler"
+
+#在Redis中保持。scrapy-redis用到的各个队列，从而允许暂停和暂停后恢复:
+# SCHEDULER_PERSIST=True
+
+# 使用scrapy_redis的去重方式:
+# DUPEFILTER_CLASS="scrapy_redis.dupefilter.RFPDupeFilter"
+
+# #定义Redis的ip和端口:
+# REDIS_HOST='127.0.0.1'
+# REDIS_PORT=6379
+# REDIS_URL = 'redis://redis:123456@127.0.0.1:6379'
+
