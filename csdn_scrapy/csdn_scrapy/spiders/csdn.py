@@ -34,7 +34,7 @@ class comicspider(scrapy.Spider):
         # 保存文章名和链接
         for i in range(len(titles)):
             item=CsdnScrapyItem()
-            item['title']=titles[i].replace(' ','').replace('\n','')
+            item['title']=titles[i].replace(' ','').replace('\n','').replace(':','：')
             item['url']=urls[i]
             items.append(item)
         # print(items)
@@ -49,7 +49,7 @@ class comicspider(scrapy.Spider):
         texts=hxs.xpath("//div[@id='article_content']//text()").extract()
         turn = []
         for each in texts:
-            each=each.replace('\n','').replace(' ','').replace('\xa0','')
+            each=each.replace('\n','').replace(' ','').replace('\xa0','').replace('\t','')
             turn.append(each)
         for i in turn:
             if i=='':

@@ -67,7 +67,7 @@ SPIDER_MIDDLEWARES = {
 ITEM_PIPELINES = {
    'csdn_scrapy.pipelines.CsdnScrapyPipeline': 300,
 }
-ARTICLE_STORE = 'E:\Spider\csdn_scrapy\download'
+ARTICLE_STORE = 'D:\python\spider\csdn_scrapy\download'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
