@@ -26,7 +26,7 @@ class comicspider(scrapy.Spider):
     def parse1(self,response):
         items=[]
         hxs=Selector(response)
-        # 标签
+        # 标签 设置标签和offset
         # navs=hxs.xpath('//div/ul')
         # 文章名
         titles=hxs.xpath('//h2/a/text()').extract()
