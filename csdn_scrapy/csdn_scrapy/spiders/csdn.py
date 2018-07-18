@@ -2,18 +2,18 @@
 import scrapy,re
 from scrapy import Selector
 from csdn_scrapy.items import CsdnScrapyItem
+from scrapy.spiders import CrawlSpider, Rule
 
 # 创建一个Spider，必须继承 scrapy.Spider 类
 class comicspider(scrapy.Spider):
     # 自己定义的内容，在运行工程的时候需要用到的标识；
     # 用于区别Spider。该名字必须是唯一的，不可以为不同的Spider设定相同的名字。
     name = 'csdn.com'
-
-    def __init__(self):
-        # 允许爬虫访问的域名，防止爬虫跑飞
-        self.allowed_domains=['www.csdn.net']
-        # start_urls:包含了Spider在启动时进行爬取的url列表。 第一个被获取到的页面将是其中之一。 后续的URL则从初始的URL获取到的数据中提取。
-        self.start_urls=['https://www.csdn.net/nav/cloud']
+    # 允许爬虫访问的域名，防止爬虫跑飞
+    allowed_domains=['www.csdn.net']
+    nav=[]
+    # start_urls:包含了Spider在启动时进行爬取的url列表。 第一个被获取到的页面将是其中之一。 后续的URL则从初始的URL获取到的数据中提取。
+    start_urls=['https://www.csdn.net/nav/newarticles']
 
     def start_requests(self):
         yield scrapy.Request(url=self.start_urls[0],callback=self.parse1)
@@ -26,6 +26,8 @@ class comicspider(scrapy.Spider):
     def parse1(self,response):
         items=[]
         hxs=Selector(response)
+        # 标签
+        # navs=hxs.xpath('//div/ul')
         # 文章名
         titles=hxs.xpath('//h2/a/text()').extract()
         # 文章链接
