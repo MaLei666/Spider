@@ -2,7 +2,7 @@
 import scrapy,json,time,hmac,base64
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
-from requests_toolbelt import MultipartEncoder
+# from requests_toolbelt import MultipartEncoder
 from hashlib import sha1
 from zhihuCrawl.items import ZhihuScrapyItem
 from scrapy import Selector

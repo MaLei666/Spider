@@ -8,7 +8,8 @@ import os
 
 
 class CsdnScrapyPipeline(object):
-    def process_item(self, item):
+    # scrapy参数用不到但是不能删除，删除会报错
+    def process_item(self, item,scrapy):
         if 'text' in item:
             # text=item['text']
             # dir_path='%s/%s'%(settings.ARTICLE_STORE,item['title'])
@@ -24,9 +25,11 @@ class CsdnScrapyPipeline(object):
             # #         article_dl.write(text)
             # file_path = '%s/%s' % (dir_path, item['title'] + '.doc')
             #     pass
-            file_path='%s/%s'%(settings.ARTICLE_STORE,item['title']+ '.doc')
+            file_path='%s\%s'%(settings.ARTICLE_STORE,item['title']+'.doc')
+            print(file_path)
             if os.path.exists(file_path):
                 pass
-            with open(file_path,'w') as article_dl:
-                article_dl.write(item['text'])
+            else:
+                with open(file_path,'w') as article_dl:
+                    article_dl.write(item['text'])
         return item
