@@ -26,10 +26,10 @@ class CsdnScrapyPipeline(object):
             # file_path = '%s/%s' % (dir_path, item['title'] + '.doc')
             #     pass
             file_path='%s\%s'%(settings.ARTICLE_STORE,item['title']+'.doc')
-            print(file_path)
+            # print(file_path)
             if os.path.exists(file_path):
-                pass
+                print('文件存在！')
             else:
-                with open(file_path,'w') as article_dl:
+                with open(file_path,'w',encoding='utf-8') as article_dl:
                     article_dl.write(item['text'])
         return item
