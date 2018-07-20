@@ -68,7 +68,7 @@ ITEM_PIPELINES = {
    'csdn_scrapy.pipelines.CsdnScrapyPipeline': 300,
 }
 # ARTICLE_STORE = 'D:\python\spider\csdn_scrapy\download'
-ARTICLE_STORE = 'E:\Spider\csdn_scrapy\download'
+# ARTICLE_STORE = '/home/download'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -90,3 +90,18 @@ ARTICLE_STORE = 'E:\Spider\csdn_scrapy\download'
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+REDIS_URL = 'redis://:zkyr1006@154.8.171.68:6379'
+
+MONGO_URL = 'mongodb://154.8.171.68:27017'
+MONGODB_DATABASE = "python"
+MONGODB_SHEETNAME = "csdn"
+# # MONGODB 主机名
+# MONGODB_HOST = "154.8.171.68"
+# # MONGODB 端口号
+# MONGODB_PORT = 27017
+
+
+
