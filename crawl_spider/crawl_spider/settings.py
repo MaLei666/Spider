@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for csdn_scrapy project
+# Scrapy settings for crawl_spider project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,17 +9,17 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'csdn_scrapy'
+BOT_NAME = 'crawl_spider'
 
-SPIDER_MODULES = ['csdn_scrapy.spiders']
-NEWSPIDER_MODULE = 'csdn_scrapy.spiders'
+SPIDER_MODULES = ['crawl_spider.spiders']
+NEWSPIDER_MODULE = 'crawl_spider.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'csdn_scrapy (+http://www.yourdomain.com)'
+#USER_AGENT = 'crawl_spider (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = False
+ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -27,13 +27,13 @@ ROBOTSTXT_OBEY = False
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 1
+#DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-COOKIES_ENABLED = False
+#COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
@@ -46,14 +46,14 @@ COOKIES_ENABLED = False
 
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
-SPIDER_MIDDLEWARES = {
-   'csdn_scrapy.middlewares.CsdnScrapySpiderMiddleware': 543,
-}
+#SPIDER_MIDDLEWARES = {
+#    'crawl_spider.middlewares.CrawlSpiderSpiderMiddleware': 543,
+#}
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'csdn_scrapy.middlewares.CsdnScrapyDownloaderMiddleware': 543,
+#    'crawl_spider.middlewares.CrawlSpiderDownloaderMiddleware': 543,
 #}
 
 # Enable or disable extensions
@@ -64,11 +64,9 @@ SPIDER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-   'csdn_scrapy.pipelines.CsdnScrapyPipeline': 300,
-}
-# ARTICLE_STORE = 'D:\python\spider\csdn_scrapy\download'
-# ARTICLE_STORE = '/home/download'
+#ITEM_PIPELINES = {
+#    'crawl_spider.pipelines.CrawlSpiderPipeline': 300,
+#}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -90,18 +88,3 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
-
-SCHEDULER = "scrapy_redis.scheduler.Scheduler"
-DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
-REDIS_URL = 'redis://:zkyr1006@154.8.171.68:6379'
-
-MONGO_URL = 'mongodb://154.8.171.68:27017'
-MONGODB_DATABASE = "python"
-# MONGODB_SHEETNAME = "csdn"
-# # MONGODB 主机名
-# MONGODB_HOST = "154.8.171.68"
-# # MONGODB 端口号
-# MONGODB_PORT = 27017
-
-
-

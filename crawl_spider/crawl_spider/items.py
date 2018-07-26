@@ -6,12 +6,9 @@
 # https://doc.scrapy.org/en/latest/topics/items.html
 
 import scrapy
-class CsdnScrapyItem(scrapy.Item):
+
+
+class CrawlSpiderItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    # 文章名
-    title = scrapy.Field()
-    # 文章链接
-    url = scrapy.Field()
-    # 文章内容
-    text = scrapy.Field()
+    pass
