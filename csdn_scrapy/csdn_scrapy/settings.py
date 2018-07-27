@@ -93,9 +93,9 @@ ITEM_PIPELINES = {
 
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
-REDIS_URL = 'redis://:zkyr1006@154.8.171.68:6379'
+REDIS_URL = 'redis://:zkyr1006@111.207.68.150:6379'
 
-MONGO_URL = 'mongodb://154.8.171.68:27017'
+MONGO_URL = 'mongodb://111.207.68.150:27017'
 MONGODB_DATABASE = "python"
 # MONGODB_SHEETNAME = "csdn"
 # # MONGODB 主机名
