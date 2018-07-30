@@ -43,7 +43,9 @@ class comicspider(scrapy.Spider):
         # 保存文章名和链接
         for i in range(len(titles)):
             item=CsdnScrapyItem()
-            item['title']=titles[i].replace(' ','').replace('\n','').replace(':','：')
+            titles[i]=self.cleanInput(titles[i])
+            # item['title']=titles[i].replace(' +','').replace('\n','').replace(':','：')
+            item['title']=titles[i]
             item['url']=urls[i]
             items.append(item)
         # print(items)
@@ -58,16 +60,29 @@ class comicspider(scrapy.Spider):
         hxs=Selector(response)
         texts=hxs.xpath("//div[@id='article_content']//text()").extract()
         turn = []
+        text=''
         for each in texts:
-            each=each.replace('\n','').replace(' ','').replace('\xa0','').replace('\t','')
+            each=self.cleanInput(each)
+            # each=each.replace('\n','').replace(' ','').replace('\xa0','').replace('\t','')
             turn.append(each)
-        for i in turn:
-            if i=='':
-                turn.remove(i)
-            # text=str(texts).replace('\n','').replace(' ','')
-        item['text']=str(turn)
+        # 用while删除，比用for实现的完整
+        while '' in turn:
+            turn.remove('')
+        for each in turn:
+            text += each
+        item['text']=text
         # print(item['text'])
         yield item
+
+    def cleanInput(self,input):
+        input = re.sub('\n+', '', input)
+        input = re.sub(' +', '', input)
+        input = re.sub('\t+', '', input)
+        input = re.sub('\xa0', '', input)
+        # input = bytes(input, 'UTF-8')
+        # input = input.decode('ascii', 'igone')
+        # input = re.sub('\[[0-9]*\]', "", input)
+        return input
 
 
 
