@@ -187,11 +187,9 @@ def train_crack_captcha_cnn():
     max_idx_l = tf.argmax(tf.reshape(Y, [-1, MAX_CAPTCHA, CHAR_SET_LEN]), 2)
     correct_pred = tf.equal(max_idx_p, max_idx_l)
     accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
-
     saver = tf.train.Saver()
-    with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
-
+    with tf.Session() as sess: #创建session
+        sess.run(tf.global_variables_initializer())     #初始化变量weights和biases
         step = 0
         while True:
             batch_x, batch_y = get_next_batch(64)

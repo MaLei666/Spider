@@ -34,7 +34,6 @@ def get_image_file_name(imgPath=CAPTCHA_IMAGE_PATH):
         total += 1
     return fileName, total
 
-
 # 将验证码转换为训练时用的标签向量，维数是 40
 # 例如，如果验证码是 ‘0296’ ，则对应的标签是
 # 对应位置置1
@@ -82,7 +81,6 @@ def get_next_batch(batchSize=32, trainOrTest='train', step=0):
         batch_label[i, :] = img_label
 
     return batch_data, batch_label
-
 
 # 构建卷积神经网络并训练
 def train_data_with_CNN():
@@ -173,8 +171,6 @@ def train_data_with_CNN():
                     saver.save(sess, MODEL_SAVE_PATH + "crack_captcha.model", global_step=steps)
                     break
             steps += 1
-
-
 if __name__ == '__main__':
     image_filename_list, total = get_image_file_name(CAPTCHA_IMAGE_PATH)
     random.seed(time.time())
