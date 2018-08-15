@@ -5,7 +5,6 @@ from bilibili.items import BilibiliItem
 from scrapy.spiders import CrawlSpider, Rule
 from bs4 import BeautifulSoup
 import requests,re
-from lxml import etree
 
 # 创建一个Spider，必须继承 scrapy.Spider 类
 class comicspider(scrapy.Spider):
