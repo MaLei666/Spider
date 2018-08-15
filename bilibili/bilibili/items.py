@@ -10,4 +10,13 @@ import scrapy
 class BilibiliItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+    # 视频名称
+    title = scrapy.Field()
+    # 视频链接
+    url = scrapy.Field()
+    # 视频简介
+    text = scrapy.Field()
+    # 观看人数
+    people=scrapy.Field()
+    # 弹幕数量
+    danmu=scrapy.Field()
