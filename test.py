@@ -41,24 +41,7 @@ headers = {
     'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
 }
-#
-# # sub_nav_url=self.sub_nav_url
-# for id in cate_id:
-#  parse = {
-#   'callback': 'jqueryCallback_bili_10',
-#   'main_ver': 'v3',
-#   'search_type': 'video',
-#   'view_type': 'hot_rank',
-#   'order': 'click',
-#   'copy_right': '-1',
-#   'cate_id': id,
-#   'page': '1',
-#   'pagesize': '20',
-#   'jsonp': 'jsonp',
-#   'time_from': '20180809',
-#   'time_to': '20180816'
-#  }
-#  ajax_url = base_url + urlencode(parse)
+
 base_url = 'https://s.search.bilibili.com/cate/search?'
 parse = {
     'callback': 'jqueryCallback_bili_10',
@@ -81,24 +64,11 @@ print(url)
 
 response = requests.get(url,headers=headers,verify=False)
 html=response.text
+js=html[23:-1]
+# print(js)
+a=json.loads(js)
 
-print(html)
-# b=json.loads(html)
-# c=b.decode(encoding='utf-8')
-# print(c)
-# a=response.json()
-# a=demjson.encode(html)
-# print(a)
-# a1=json.loads(a)
-# b=a1.encode(encoding='utf-8')
-# print(b)
-# resuit=json.loads(b)
-# new=json.dumps(resuit,ensure_ascii=False)
-
-# print(new)
-
-
-# b=a.get('numPages')
-# print(b)
+b=a.get('numPages')
+print(b)
 
 
