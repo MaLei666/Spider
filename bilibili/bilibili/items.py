@@ -12,6 +12,8 @@ class BilibiliItem(scrapy.Item):
     # name = scrapy.Field()
     # 视频名称
     title = scrapy.Field()
+    # 视频类别
+    class_v=scrapy.Field()
     # 视频链接
     url = scrapy.Field()
     # 视频简介

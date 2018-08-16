@@ -5,6 +5,8 @@ from bilibili.items import BilibiliItem
 from scrapy.spiders import CrawlSpider, Rule
 from bs4 import BeautifulSoup
 import requests,re
+from urllib.parse import urlencode
+
 
 # 创建一个Spider，必须继承 scrapy.Spider 类
 class comicspider(scrapy.Spider):
@@ -55,14 +57,52 @@ class comicspider(scrapy.Spider):
         print(hot_list_urls)
 
         for hot_url in hot_list_urls:
-            yield scrapy.Request(url=hot_url,callback=self.all_video_list,dont_filter=True,headers=self.headers)
+            self.all_video_list(hot_url)
 
-    def all_video_list(self,response):
-        all_videos=[]
-        sub_nav_url=self.sub_nav_url
-        page=Selector(response)
-        pages=page.xpath('//ul[@class="pages"]//li//text()').extract()
-        print(pages)
+    def all_video_list(self,url):
+        ajax_urls=[]
+        base_url='https://s.search.bilibili.com/cate/search?'
+        cate_id = [
+            24, 25, 47, 27, 33, 32, 51, 152, 153, 168, 169, 170, 28, 31, 30, 59, 29, 54, 130, 20, 154, 156, 17, 171,
+            172, 65, 173, 121, 136, 19, 124, 122, 39, 96, 95, 98, 176, 138, 21, 76, 75, 161, 162, 163, 174, 22, 26, 126,
+            127, 157, 158, 164, 159, 71, 137, 131, 182, 183, 85, 184, 86]
+
+        # sub_nav_url=self.sub_nav_url
+        for id in cate_id:
+            parse={
+            'callback':'jqueryCallback_bili_10',
+            'main_ver':'v3',
+            'search_type':'video',
+            'view_type':'hot_rank',
+            'order':'click',
+            'copy_right':'-1',
+            'cate_id':id,
+            'page':'1',
+            'pagesize':'20',
+            'jsonp':'jsonp',
+            'time_from':'20180809',
+            'time_to':'20180816'
+            }
+            ajax_url=base_url+urlencode(parse)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # page=Selector(response)
+        # pages=page.xpath('//ul[@class="pages"]//li//text()').extract()
+        # print(pages)
     #     video_pages=int(page.xpath('//li[@class="page-item last"]/button/text()').extract()[0])
     #     print(video_pages)
     #     for i in range(1,video_pages+1):
