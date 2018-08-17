@@ -18,8 +18,15 @@ class BilibiliPipeline(object):
             mongo_db=crawler.settings.get("MONGODB_DATABASE")
         )
 
+    def open_spider(self, spider):
+        self.client = pymongo.MongoClient(self.mongo_url)
+        self.db = self.client[self.mongo_db]
 
 
+    def process_item(self, item, name,spider):
+        self.db[name].insert(dict(item))
 
-    def process_item(self, item, spider):
         return item
+
+    def close_spider(self, spider):
+        self.client.close()

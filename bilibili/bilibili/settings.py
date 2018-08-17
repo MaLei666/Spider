@@ -47,14 +47,19 @@ COOKIES_ENABLED = False
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 SPIDER_MIDDLEWARES = {
-   'bilibili.middlewares.BilibiliSpiderMiddleware': 543,
+   # 'bilibili.middlewares.BilibiliSpiderMiddleware': 543,
+   'scrapy_splash.SplashDeduplicateArgsMiddleware': 100,
 }
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
-#    'bilibili.middlewares.BilibiliDownloaderMiddleware': 543,
-#}
+DOWNLOADER_MIDDLEWARES = {
+   # 'bilibili.middlewares.BilibiliDownloaderMiddleware': 543,
+   'scrapy_splash.SplashCookiesMiddleware':723,
+   'scrapy_splash.SplashMiddleware':725,
+   'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware':810,
+
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
@@ -87,12 +92,13 @@ ITEM_PIPELINES = {
 #HTTPCACHE_EXPIRATION_SECS = 0
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
-#HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
 # SCHEDULER = "scrapy_redis.scheduler.Scheduler"
-# DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 # REDIS_URL = 'redis://:zkyr1006@111.207.68.150:6379'
 
 MONGO_URL = 'mongodb://111.207.68.150:27017'
 MONGODB_DATABASE = "python"
 
 REDIRECT_ENABLED = False
+SPLASH_URL='http://localhost:8050'

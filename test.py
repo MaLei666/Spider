@@ -23,52 +23,56 @@ from scrapy import Selector
 # a=['https://www.bilibili.com/v/douga/mad/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/douga/mmd/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/douga/voice/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/douga/other/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/anime/serial/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/anime/finish/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/anime/information/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/anime/offical/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/guochuang/chinese/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/guochuang/original/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/guochuang/puppetry/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/guochuang/information/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/music/original/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/music/cover/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/music/vocaloid/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/music/perform/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/music/coordinate/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/music/oped/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/music/collection/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/dance/otaku/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/dance/three_d/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/dance/demo/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/game/stand_alone/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/game/esports/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/game/mobile/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/game/online/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/game/board/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/game/gmv/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/game/music/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/game/mugen/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/technology/fun/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/technology/wild/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/technology/speech_course/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/technology/military/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/technology/digital/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/technology/mechanical/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/technology/automobile/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/life/funny/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/life/daily/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/life/food/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/life/animal/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/life/handmake/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/life/painting/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/life/sports/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/life/other/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/kichiku/guide/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/kichiku/mad/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/kichiku/manual_vocaloid/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/kichiku/course/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/fashion/makeup/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/fashion/clothing/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/fashion/aerobics/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/fashion/information/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/ent/variety/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/ent/star/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/ent/korea/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/cinephile/cinecism/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/cinephile/montage/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/cinephile/shortfilm/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/cinephile/trailer_info/#/all/click/0/1/2018-08-01,2018-08-15', 'https://www.bilibili.com/v/cinephile/tokusatsu/#/all/click/0/1/2018-08-01,2018-08-15']
 # for i in a:
 #     print(i)
+from scrapy_splash import SplashRequest
+from scrapy  import Selector
 
-# cate_id=[
-#  24,25,47,27,33,32,51,152,153,168,169,170,28,31,30,59,29,54,130,20,154,156,17,171,172,65,173,121,136,19,124,122,39, 96,95,98,176,138, 21,76,75,161,162,163,174,22,26,126,127,157,158,164,159,71,137,131,182,183, 85,184,86]
-from urllib.parse import urlencode
-
-# ajax_urls = []
-cate_id = [
- 24, 25, 47, 27, 33, 32, 51, 152, 153, 168, 169, 170, 28, 31, 30, 59, 29, 54, 130, 20, 154, 156, 17, 171,
- 172, 65, 173, 121, 136, 19, 124, 122, 39, 96, 95, 98, 176, 138, 21, 76, 75, 161, 162, 163, 174, 22, 26, 126,
- 127, 157, 158, 164, 159, 71, 137, 131, 182, 183, 85, 184, 86]
 
 headers = {
     'Connection': 'keep-alive',
-    'Host': 's.search.bilibili.com',
+    'Host': 'www.bilibili.com',
     'Accept-Encoding': 'gzip, deflate, br',
     'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
 }
 
-base_url = 'https://s.search.bilibili.com/cate/search?'
-parse = {
-    'callback': 'jqueryCallback_bili_10',
-    'main_ver': 'v3',
-    'search_type': 'video',
-    'view_type': 'hot_rank',
-    'order': 'click',
-    'copy_right': '-1',
-    'cate_id': '26',
-    'page': '1',
-    'pagesize': '20',
-    'jsonp': 'jsonp',
-    'time_from': '20180809',
-    'time_to': '20180816'
-}
+# url=' https://www.bilibili.com/v/guochuang/chinese/#/all/click/0/1/2018-08-14,2018-08-15 '
+#
+# # res=SplashRequest(url=url,callback=None,args={'wait':0.5},splash_headers=headers)
+# # res=Selector(res)
+# res=requests.get(url)
+# res=Selector(res)
+# # res=etree.parse(res,etree.HTMLParser())
+# # res=etree.tostring(html).decode('utf-8')
+# video_pages = res.xpath('//ul[@class="nav-menu"]/li[last()-1]//text()').extract()
+# print(video_pages)
+res=requests.get('https://www.bilibili.com/',headers=headers)
+hot_list_urls=[]
+nav_names=[]
+time_tip='/2018-08-17,2018-08-17'
+page = Selector(res)
+# 所有子标签的url
+sub_nav_urls=page.xpath('//ul[@class="sub-nav"]//li/a/@href').extract()
+# print(sub_nav_urls)
 
-url = base_url + urlencode(parse)
-print(url)
-# url='https://s.search.bilibili.com/cate/search?callback=jqueryCallback_bili_23&main_ver=v3&search_type=video&view_type=hot_rank&order=click&copy_right=-1&cate_id='+'26'+'&page=10&pagesize=20&jsonp=jsonp&time_from=20180801&time_to=20180816'
+# 构建所有子标签URL，测试是否具有热度排行的标签，有就保存URL，没有就忽略
+for sub_nav_url in sub_nav_urls:
+    sub_nav_url1 = 'https:' + sub_nav_url
+    res=requests.get(url=sub_nav_url1,headers=headers).text
+    html=BeautifulSoup(res,'lxml')
+    # tip = res.xpath('//div[@class="left"]/ul/a[2]/@href').extract()
+    tip=html.find_all(href=re.compile('#/all/click/0/1/'))
+    # print(tip)
+    if len(tip) != 0:
+        # if tip != []
+        hot_list_url = sub_nav_url1 + '#/all/click/0/1'+time_tip
+        nav_name=html.find_all(href=re.compile(sub_nav_url))[0]
+        nav_name=Selector(nav_name)
+        nav_name=nav_name.xpath('//text()').extract()
 
-response = requests.get(url,headers=headers,verify=False)
-html=response.text
-js=html[23:-1]
-# print(js)
-a=json.loads(js)
-
-b=a.get('numPages')
-print(b)
+        print(nav_name)
+        hot_list_urls.append(hot_list_url)
+        # print(hot_list_urls)
+    else:
+        sub_nav_urls.remove(sub_nav_url)
 
 
