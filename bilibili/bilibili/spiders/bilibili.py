@@ -67,10 +67,8 @@ class comicspider(scrapy.Spider):
         print(self.nav_names)
         # hot_list_urls=['https://www.bilibili.com/v/guochuang/chinese/#/all/click/0/1/2018-08-10,2018-08-17']
         # print(hot_list_urls)
-        for hot_url in hot_list_urls:
-            self.hot_url=hot_url
-            print(self.hot_url)
-            yield SplashRequest(hot_url,self.parse0,args={'wait':0.5},splash_headers=self.headers)
+        for i in range(0,len(hot_list_urls)):
+            yield SplashRequest(hot_list_urls[i],self.parse0,args={'wait':0.5},splash_headers=self.headers,meta={'hot_list_url':hot_list_urls[i]})
         # print(hot_list_urls)
 
         # self.all_video_list()
@@ -78,9 +76,9 @@ class comicspider(scrapy.Spider):
     def parse0(self,response):
         # print(response.text)
         page = Selector(response)
+        hot_list_url=response.meta(['hot_list_url'])
         all_videos=[]
-        hot_url=self.hot_url[:-23]
-        print(hot_url)
+        print(hot_list_url)
         # hot_url有问题，都是https://www.bilibili.com/v/cinephile/tokusatsu/，
 
 
@@ -98,49 +96,49 @@ class comicspider(scrapy.Spider):
 
 
 
-        # print(page.text)
-        # video_pages=page.xpath('//ul[@class="pages"]/li[last()-1]//text()').extract()
-        try:
-            video_pages=int(page.xpath('//ul[@class="pages"]/li[last()-1]//text()').extract()[0])
-            # print(video_pages)
-            for i in range(1,video_pages+1):
-                all_videos.append(hot_url+str(i)+self.time_tip)
-                # print(hot_url+str(i)+self.time_tip)
-            # print(all_videos)
-        except:
-            all_videos.append(self.hot_url)
-
-        for all_video in all_videos:
-            print(all_video)
-            yield SplashRequest(all_video,self.parse1,args={'wait':0.5},splash_headers=self.headers)
-
-    def parse1(self, response):
-        items=[]
-        page=Selector(response)
-        try:
-            titles=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/a/text()').extract()
-            urls=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/a/@href').extract()
-            texts=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/div[@class="v-desc"]/text()').extract()
-            peoples=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/div[@class="v-info"]/span[1]/span/text()').extract()
-            danmus=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/div[@class="v-info"]/span[2]/span/text()').extract()
-            for i in range(len(titles)):
-                item = BilibiliItem()
-                item['title'] = titles[i]
-                item['url'] = urls[i]
-                item['text'] = texts[i]
-                item['people'] = peoples[i]
-                item['danmu'] = danmus[i]
-                items.append(item)
-                self.collect_name=self.nav_names[i]
-            for item in items:
-                # print(item)
-                yield item,self.collect_name
-        except:
-            pass
-
-
-
-
+    #     # print(page.text)
+    #     # video_pages=page.xpath('//ul[@class="pages"]/li[last()-1]//text()').extract()
+    #     try:
+    #         video_pages=int(page.xpath('//ul[@class="pages"]/li[last()-1]//text()').extract()[0])
+    #         # print(video_pages)
+    #         for i in range(1,video_pages+1):
+    #             all_videos.append(hot_url+str(i)+self.time_tip)
+    #             # print(hot_url+str(i)+self.time_tip)
+    #         # print(all_videos)
+    #     except:
+    #         all_videos.append(self.hot_url)
+    #
+    #     for all_video in all_videos:
+    #         print(all_video)
+    #         yield SplashRequest(all_video,self.parse1,args={'wait':0.5},splash_headers=self.headers)
+    #
+    # def parse1(self, response):
+    #     items=[]
+    #     page=Selector(response)
+    #     try:
+    #         titles=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/a/text()').extract()
+    #         urls=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/a/@href').extract()
+    #         texts=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/div[@class="v-desc"]/text()').extract()
+    #         peoples=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/div[@class="v-info"]/span[1]/span/text()').extract()
+    #         danmus=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/div[@class="v-info"]/span[2]/span/text()').extract()
+    #         for i in range(len(titles)):
+    #             item = BilibiliItem()
+    #             item['title'] = titles[i]
+    #             item['url'] = urls[i]
+    #             item['text'] = texts[i]
+    #             item['people'] = peoples[i]
+    #             item['danmu'] = danmus[i]
+    #             items.append(item)
+    #             self.collect_name=self.nav_names[i]
+    #         for item in items:
+    #             # print(item)
+    #             yield item,self.collect_name
+    #     except:
+    #         pass
+    #
+    #
+    #
+    #
 
 
 
