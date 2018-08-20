@@ -98,7 +98,7 @@ DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 # REDIS_URL = 'redis://:zkyr1006@111.207.68.150:6379'
 
 MONGO_URL = 'mongodb://111.207.68.150:27017'
-MONGODB_DATABASE = "python"
+MONGODB_DATABASE = "blbl"
 
 REDIRECT_ENABLED = False
 SPLASH_URL='http://111.207.68.150:8050'

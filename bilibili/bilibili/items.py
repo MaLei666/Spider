@@ -22,3 +22,5 @@ class BilibiliItem(scrapy.Item):
     people=scrapy.Field()
     # 弹幕数量
     danmu=scrapy.Field()
+    # 所属分类
+    class_name=scrapy.Field()

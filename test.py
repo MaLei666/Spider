@@ -45,6 +45,8 @@ headers = {
 # # res=etree.tostring(html).decode('utf-8')
 # video_pages = res.xpath('//ul[@class="nav-menu"]/li[last()-1]//text()').extract()
 # print(video_pages)
+
+
 res=requests.get('https://www.bilibili.com/',headers=headers)
 hot_list_urls=[]
 nav_names=[]

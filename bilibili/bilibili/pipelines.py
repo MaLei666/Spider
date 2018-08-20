@@ -23,8 +23,12 @@ class BilibiliPipeline(object):
         self.db = self.client[self.mongo_db]
 
 
-    def process_item(self, item, name,spider):
-        self.db[name].insert(dict(item))
+    def process_item(self, item, spider):
+        sheet=self.db[item['class_name']]
+        if sheet.find_one({'url':item['url']}):
+            print('数据已存在')
+        else:
+            sheet.insert(dict(item))
 
         return item
 
