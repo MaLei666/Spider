@@ -68,7 +68,7 @@ class ZhihuComSpider(scrapy.Spider):
                 'source':self.source,
                 'signature':self.get_signnature(self.grant_type, self.client_id, self.source, self.timestamp),
                 'username':'+8618401570769',
-                'password':'conglingkaishi0',
+                'password':'*********',
                 'captcha':'',
                 # 改为'cn'是倒立汉字验证码
                 'lang':'en',
@@ -116,7 +116,7 @@ class ZhihuComSpider(scrapy.Spider):
             'source': self.source,
             'signature': self.get_signnature(self.grant_type, self.client_id, self.source, self.timestamp),
             'username': '+8618401570769',
-            'password': 'conglingkaishi0',
+            'password': '*******',
             'captcha': '',
             'lang': 'en',
             'ref_source': 'other_',
