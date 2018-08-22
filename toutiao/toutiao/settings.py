@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for bilibili project
+# Scrapy settings for toutiao project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,14 +9,14 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'bilibili'
+BOT_NAME = 'toutiao'
 
-SPIDER_MODULES = ['bilibili.spiders']
-NEWSPIDER_MODULE = 'bilibili.spiders'
+SPIDER_MODULES = ['toutiao.spiders']
+NEWSPIDER_MODULE = 'toutiao.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
+#USER_AGENT = 'toutiao (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -27,7 +27,7 @@ ROBOTSTXT_OBEY = False
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 1
+DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
@@ -47,18 +47,13 @@ COOKIES_ENABLED = False
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 SPIDER_MIDDLEWARES = {
-   # 'bilibili.middlewares.BilibiliSpiderMiddleware': 543,
-   'scrapy_splash.SplashDeduplicateArgsMiddleware': 100,
+   'toutiao.middlewares.ToutiaoSpiderMiddleware': 543,
 }
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   # 'bilibili.middlewares.BilibiliDownloaderMiddleware': 543,
-   'scrapy_splash.SplashCookiesMiddleware':723,
-   'scrapy_splash.SplashMiddleware':725,
-   'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware':810,
-
+   'toutiao.middlewares.ToutiaoDownloaderMiddleware': 543,
 }
 
 # Enable or disable extensions
@@ -70,7 +65,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'bilibili.pipelines.BilibiliPipeline': 300,
+   'toutiao.pipelines.ToutiaoPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -92,14 +87,4 @@ ITEM_PIPELINES = {
 #HTTPCACHE_EXPIRATION_SECS = 0
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
-HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
-DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
-
-MONGO_URL = 'mongodb://111.207.68.150:27017'
-MONGODB_DATABASE = "blbl"
-
-REDIRECT_ENABLED = False
-SPLASH_URL='http://111.207.68.150:8050'
-
-# SCHEDULER = "scrapy_redis.scheduler.Scheduler"
-# REDIS_URL = 'redis://:zkyr1006@111.207.68.150:6379'
+#HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
