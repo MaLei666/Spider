@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import scrapy
+import scrapy,time,hashlib
 from scrapy import Selector
 from toutiao.items import ToutiaoItem
 from scrapy.spiders import CrawlSpider, Rule
@@ -33,23 +33,49 @@ class comicspider(scrapy.Spider):
     def sub_nav(self, response):
         page = Selector(response)
         # print(response.text)
-        # 所有子标签的url
-        sub_nav_urls1=page.xpath('//div[@class="channel"]/ul/li/a/@href').extract()
-        del sub_nav_urls1[:2],sub_nav_urls1[-1]
-        sub_nav_urls2=page.xpath('//div[@class="channel-more-layer"]/ul/li/a/@href').extract()
-        sub_nav_urls=sub_nav_urls1+sub_nav_urls2
+        # 所有子标签的``
+        sub_nav_tips1=page.xpath('//div[@class="channel"]/ul/li/a/@href').extract()
+        del sub_nav_tips1[:2],sub_nav_tips1[-1]
+        sub_nav_tips2=page.xpath('//div[@class="channel-more-layer"]/ul/li/a/@href').extract()
+        sub_nav_tips=sub_nav_tips1+sub_nav_tips2
 
-        sub_name1=page.xpath('//div[@class="channel"]/ul/li/a/span/text()').extract()
-        del sub_name1[:2], sub_name1[-1]
-        sub_name2=page.xpath('//div[@class="channel-more-layer"]/ul/li/a/span/text()').extract()
-        self.sub_name=sub_name1+sub_name2
-        # print(sub_nav_urls,'\n',sub_name)
+        sub_names1=page.xpath('//div[@class="channel"]/ul/li/a/span/text()').extract()
+        del sub_names1[:2], sub_names1[-1]
+        sub_names2=page.xpath('//div[@class="channel-more-layer"]/ul/li/a/span/text()').extract()
+        sub_names=sub_names1+sub_names2
 
 
-        for sub_nav_url in sub_nav_urls:
-            sub_url = self.start_urls[0] +sub_nav_url
-            print(sub_url)
-            # yield SplashRequest(sub_nav_url,callback=self.parse,splash_headers=self.headers,args={'wait':0.5})
+        ajax_url_base = 'https://www.toutiao.com/api/pc/feed/?'
+
+        # print(sub_nav_url)
+
+        for sub_nav_tip in sub_nav_tips:
+            sub_nav_tip = sub_nav_tips[4:-1]
+            send_data = {
+                'category' : sub_nav_tip,
+                'utm_source':'toutiao',
+                'widen':'1',
+                'max_behot_time':'',
+                'max_behot_time_tmp':'',
+                'tadrequire':'true',
+                'as':'A1A55B173E0B004',
+                'cp':'5B7EAB708004FE1',
+                '_signature':'Vxj1WAAADGfe-czCZbMMyVcY9U'
+            }
+
+
+
+        # for sub_nav_tip in sub_nav_tips:
+        #     sub_nav_tip = sub_nav_tips[4:-1]
+        #     print(sub_nav_tip)
+            # yield SplashRequest(sub_url,callback=self.parse,splash_headers=self.headers,args={'wait':0.5},meta={'sub_nav_urls':sub_nav_urls})
+
+
+    # def parse(self, response):
+    #     sub_nav_urls=response.meta['sub_nav_urls']
+
+
+
 
 
 
@@ -126,14 +152,40 @@ class comicspider(scrapy.Spider):
     #     except:
     #         pass
     #
-    # def cleanInput(self,input):
-    #     input = re.sub('\n+', '', input)
-    #     input = re.sub(' +', '', input)
-    #     input = re.sub('\t+', '', input)
-    #     input = re.sub('\xa0', '', input)
-    #     # input = bytes(input, 'UTF-8')
-    #     # input = input.decode('ascii', 'igone')
-    #     # input = re.sub('\[[0-9]*\]', "", input)
-    #     return input
+    def cleanInput(self,input):
+        input = re.sub('\n+', '', input)
+        input = re.sub(' +', '', input)
+        input = re.sub('\t+', '', input)
+        input = re.sub('\xa0', '', input)
+        # input = bytes(input, 'UTF-8')
+        # input = input.decode('ascii', 'igone')
+        # input = re.sub('\[[0-9]*\]', "", input)
+        return input
+
+    def get_as_cp():
+        zz = {}
+        now = round(time.time())
+        print(now)
+        # 获取计算机时间
+        e = hex(int(now)).upper()[2:]  # hex()转换一个整数对象为十六进制的字符串表示
+        print(e)
+        i = hashlib.md5(str(int(now))).hexdigest().upper()  # hashlib.md5().hexdigest()创建hash对象并返回16进制结果
+        if len(e) != 8:
+            zz = {'as': "479BB4B7254C150",
+                  'cp': "7E0AC8874BB0985"}
+            return zz
+        n = i[:5]
+        a = i[-5:]
+        r = ""
+        s = ""
+        for i in range(5):
+            s = s + n[i] + e[i]
+        for j in range(5):
+            r = r + e[j + 3] + a[j]
+        zz = {
+            'as': "A1" + s + e[-3:],
+            'cp': e[0:3] + r + "E1"
+        }
+        print(zz)
 
 

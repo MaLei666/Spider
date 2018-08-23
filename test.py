@@ -26,17 +26,36 @@ from urllib.request import urlopen
 #     print(i)
 from scrapy_splash import SplashRequest
 from scrapy  import Selector
+import time,hashlib
 
-headers = {
-    'Connection': 'keep-alive',
-    'Host': 'www.toutiao.com',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
-}
+def get_as_cp():
+    zz = {}
+    now = round(time.time())
+    print(now)
+    # 获取计算机时间
+    e = hex(int(now)).upper()[2:]  # hex()转换一个整数对象为十六进制的字符串表示
+    print(e)
+    i = hashlib.md5(str(int(now))).hexdigest().upper()  # hashlib.md5().hexdigest()创建hash对象并返回16进制结果
+    if len(e) != 8:
+        zz = {'as': "479BB4B7254C150",
+              'cp': "7E0AC8874BB0985"}
+        return zz
 
-res=requests.get('https://www.toutiao.com/ch/news_tech/',headers=headers)
-print(res.text)
+    n = i[:5]
+    a = i[-5:]
+    r = ""
+    s = ""
+    for i in range(5):
+        s = s + n[i] + e[i]
+    for j in range(5):
+        r = r + e[j + 3] + a[j]
+    zz = {
+        'as': "A1" + s + e[-3:],
+        'cp': e[0:3] + r + "E1"
+    }
+    print(zz)
+
+get_as_cp()
 
 
 
