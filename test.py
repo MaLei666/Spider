@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 # from urllib.parse import quote
 from lxml import etree
 from scrapy import Selector
+from urllib.request import urlopen
 
 # string='https://www.bilibili.com/v/technology/fun/#/all/click/0/1/2018-08-01,2018-08-15'
 # string=quote(string)
@@ -26,55 +27,18 @@ from scrapy import Selector
 from scrapy_splash import SplashRequest
 from scrapy  import Selector
 
-
 headers = {
     'Connection': 'keep-alive',
-    'Host': 'www.bilibili.com',
+    'Host': 'www.toutiao.com',
     'Accept-Encoding': 'gzip, deflate, br',
-    'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
 }
 
-# url=' https://www.bilibili.com/v/guochuang/chinese/#/all/click/0/1/2018-08-14,2018-08-15 '
-#
-# # res=SplashRequest(url=url,callback=None,args={'wait':0.5},splash_headers=headers)
-# # res=Selector(res)
-# res=requests.get(url)
-# res=Selector(res)
-# # res=etree.parse(res,etree.HTMLParser())
-# # res=etree.tostring(html).decode('utf-8')
-# video_pages = res.xpath('//ul[@class="nav-menu"]/li[last()-1]//text()').extract()
-# print(video_pages)
+res=requests.get('https://www.toutiao.com/ch/news_tech/',headers=headers)
+print(res.text)
 
 
-res=requests.get('https://www.bilibili.com/',headers=headers)
-hot_list_urls=[]
-nav_names=[]
-time_tip='/2018-08-17,2018-08-17'
-page = Selector(res)
-# 所有子标签的url
-sub_nav_urls=page.xpath('//ul[@class="sub-nav"]//li/a/@href').extract()
-# print(sub_nav_urls)
 
-# 构建所有子标签URL，测试是否具有热度排行的标签，有就保存URL，没有就忽略
-for sub_nav_url in sub_nav_urls:
-    sub_nav_url1 = 'https:' + sub_nav_url
-    res=requests.get(url=sub_nav_url1,headers=headers).text
-    html=BeautifulSoup(res,'lxml')
-    # tip = res.xpath('//div[@class="left"]/ul/a[2]/@href').extract()
-    tip=html.find_all(href=re.compile('#/all/click/0/1/'))
-    # print(tip)
-    if len(tip) != 0:
-        # if tip != []
-        hot_list_url = sub_nav_url1 + '#/all/click/0/1'+time_tip
-        nav_name=html.find_all(href=re.compile(sub_nav_url))[0]
-        nav_name=Selector(nav_name)
-        nav_name=nav_name.xpath('//text()').extract()
-
-        print(nav_name)
-        hot_list_urls.append(hot_list_url)
-        # print(hot_list_urls)
-    else:
-        sub_nav_urls.remove(sub_nav_url)
 
 

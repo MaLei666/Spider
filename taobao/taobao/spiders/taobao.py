@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy import Selector
-from toutiao.items import ToutiaoItem
+from taobao.items import TaobaoItem
 from scrapy.spiders import CrawlSpider, Rule
 from bs4 import BeautifulSoup
 import requests,re
@@ -12,7 +12,7 @@ from scrapy_splash import SplashRequest
 class comicspider(scrapy.Spider):
     # 自己定义的内容，在运行工程的时候需要用到的标识；
     # 用于区别Spider。该名字必须是唯一的，不可以为不同的Spider设定相同的名字。
-    name = 'tt'
+    name = 'tb'
     # 允许爬虫访问的域名，防止爬虫跑飞
     allowed_domains=['www.toutiao.com']
     # start_urls:包含了Spider在启动时进行爬取的url列表。 第一个被获取到的页面将是其中之一。 后续的URL则从初始的URL获取到的数据中提取。
@@ -27,33 +27,20 @@ class comicspider(scrapy.Spider):
     }
 
     def start_requests(self):
-        yield SplashRequest(url=self.start_urls[0],callback=self.sub_nav,splash_headers=self.headers,args={'wait':0.5},)
+        yield SplashRequest(self.start_urls[0],self.sub_nav,splash_headers=self.headers,args={'wait':0.5})
         # yield scrapy.Request(url=self.start_urls[0],callback=self.sub_nav,headers=self.headers)
 
     def sub_nav(self, response):
-        page = Selector(response)
-        # print(response.text)
+        res=response.text
+        print(res)
+
+        # res=requests.get(self.start_urls[0])
+        # print(res.text)
+        # page = Selector(response)
+
         # 所有子标签的url
-        sub_nav_urls1=page.xpath('//div[@class="channel"]/ul/li/a/@href').extract()
-        del sub_nav_urls1[:2],sub_nav_urls1[-1]
-        sub_nav_urls2=page.xpath('//div[@class="channel-more-layer"]/ul/li/a/@href').extract()
-        sub_nav_urls=sub_nav_urls1+sub_nav_urls2
-
-        sub_name1=page.xpath('//div[@class="channel"]/ul/li/a/span/text()').extract()
-        del sub_name1[:2], sub_name1[-1]
-        sub_name2=page.xpath('//div[@class="channel-more-layer"]/ul/li/a/span/text()').extract()
-        self.sub_name=sub_name1+sub_name2
-        # print(sub_nav_urls,'\n',sub_name)
-
-
-        for sub_nav_url in sub_nav_urls:
-            sub_url = self.start_urls[0] +sub_nav_url
-            print(sub_url)
-            # yield SplashRequest(sub_nav_url,callback=self.parse,splash_headers=self.headers,args={'wait':0.5})
-
-
-
-
+        # sub_nav_urls=page.xpath('//li[@onclick=""]/a/@href').extract()
+        # print(sub_nav_urls)
     #     hot_list_urls=[]
     #     self.nav_names=[]
     #     self.time_tip='/2018-08-20,2018-08-20'

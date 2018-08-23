@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for toutiao project
+# Scrapy settings for taobao project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,14 +9,14 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'toutiao'
+BOT_NAME = 'taobao'
 
-SPIDER_MODULES = ['toutiao.spiders']
-NEWSPIDER_MODULE = 'toutiao.spiders'
+SPIDER_MODULES = ['taobao.spiders']
+NEWSPIDER_MODULE = 'taobao.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'toutiao (+http://www.yourdomain.com)'
+#USER_AGENT = 'taobao (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -47,16 +47,16 @@ COOKIES_ENABLED = False
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 SPIDER_MIDDLEWARES = {
-   # 'toutiao.middlewares.ToutiaoSpiderMiddleware': 543,
-   'scrapy_splash.SplashDeduplicateArgsMiddleware': 100,
+   # 'taobao.middlewares.TaobaoSpiderMiddleware': 543,
+    'scrapy_splash.SplashDeduplicateArgsMiddleware': 100,
 
 }
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   # 'toutiao.middlewares.ToutiaoDownloaderMiddleware': 543,
-   'scrapy_splash.SplashCookiesMiddleware': 723,
+   # 'taobao.middlewares.TaobaoDownloaderMiddleware': 543,
+    'scrapy_splash.SplashCookiesMiddleware': 723,
    'scrapy_splash.SplashMiddleware': 725,
    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
 }
@@ -70,7 +70,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'toutiao.pipelines.ToutiaoPipeline': 300,
+   'taobao.pipelines.TaobaoPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
