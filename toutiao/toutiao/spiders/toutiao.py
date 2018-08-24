@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-import scrapy,time,hashlib
+import scrapy,time,hashlib,execjs
 from scrapy import Selector
 from toutiao.items import ToutiaoItem
 from scrapy.spiders import CrawlSpider, Rule
 from bs4 import BeautifulSoup
 import requests,re
 from scrapy_splash import SplashRequest
-
+from urllib.parse import urlencode
 
 # 创建一个Spider，必须继承 scrapy.Spider 类
 class comicspider(scrapy.Spider):
@@ -25,10 +25,11 @@ class comicspider(scrapy.Spider):
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
     }
+    # js_file=open('E:/Spider/toutiao/toutiao/signature.js','r').read()
 
     def start_requests(self):
-        yield SplashRequest(url=self.start_urls[0],callback=self.sub_nav,splash_headers=self.headers,args={'wait':0.5},)
-        # yield scrapy.Request(url=self.start_urls[0],callback=self.sub_nav,headers=self.headers)
+        # yield SplashRequest(url=self.start_urls[0],callback=self.sub_nav,splash_headers=self.headers,args={'wait':0.5},)
+        yield scrapy.Request(url=self.start_urls[0],callback=self.sub_nav,headers=self.headers,dont_filter=True)
 
     def sub_nav(self, response):
         page = Selector(response)
@@ -50,19 +51,24 @@ class comicspider(scrapy.Spider):
         # print(sub_nav_url)
 
         for sub_nav_tip in sub_nav_tips:
-            sub_nav_tip = sub_nav_tips[4:-1]
+            # signature=execjs.compile(self.js_file)
+            # si=signature.call('a')
+
             send_data = {
-                'category' : sub_nav_tip,
+                'category' : sub_nav_tip[4:-1],
                 'utm_source':'toutiao',
                 'widen':'1',
-                'max_behot_time':'',
-                'max_behot_time_tmp':'',
+                'max_behot_time':self.get_as_cp()[0],
+                'max_behot_time_tmp':self.get_as_cp()[0],
                 'tadrequire':'true',
-                'as':'A1A55B173E0B004',
-                'cp':'5B7EAB708004FE1',
-                '_signature':'Vxj1WAAADGfe-czCZbMMyVcY9U'
+                'as':self.get_as_cp()[1],
+                'cp':self.get_as_cp()[2],
+                # '_signature':signature
             }
+            url=ajax_url_base+urlencode(send_data)
+            print(url)
 
+            # print(signature)
 
 
         # for sub_nav_tip in sub_nav_tips:
@@ -162,30 +168,28 @@ class comicspider(scrapy.Spider):
         # input = re.sub('\[[0-9]*\]', "", input)
         return input
 
-    def get_as_cp():
-        zz = {}
+    def get_as_cp(self):
         now = round(time.time())
-        print(now)
+        # print(now, type(now))
         # 获取计算机时间
-        e = hex(int(now)).upper()[2:]  # hex()转换一个整数对象为十六进制的字符串表示
-        print(e)
-        i = hashlib.md5(str(int(now))).hexdigest().upper()  # hashlib.md5().hexdigest()创建hash对象并返回16进制结果
+        e = hex(now).upper()[2:]  # hex()转换一个整数对象为十六进制的字符串表示
+        # print(e)
+        i = hashlib.md5(str(now).encode('utf-8')).hexdigest().upper()  # hashlib.md5().hexdigest()创建hash对象并返回16进制结果
         if len(e) != 8:
-            zz = {'as': "479BB4B7254C150",
-                  'cp': "7E0AC8874BB0985"}
-            return zz
-        n = i[:5]
-        a = i[-5:]
-        r = ""
-        s = ""
-        for i in range(5):
-            s = s + n[i] + e[i]
-        for j in range(5):
-            r = r + e[j + 3] + a[j]
-        zz = {
-            'as': "A1" + s + e[-3:],
-            'cp': e[0:3] + r + "E1"
-        }
-        print(zz)
+            as_ = '479BB4B7254C150'
+            cp = '7E0AC8874BB0985'
+            return as_,cp
+        else:
+            n = i[:5]
+            a = i[-5:]
+            r = ""
+            s = ""
+            for i in range(5):
+                s = s + n[i] + e[i]
+            for j in range(5):
+                r = r + e[j + 3] + a[j]
+            as_= "A1" + s + e[-3:]
+            cp= e[0:3] + r + "E1"
+            return now,as_,cp
 
 

@@ -96,4 +96,4 @@ HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 
 REDIRECT_ENABLED = False
-SPLASH_URL='http://111.207.68.150:8050'
+SPLASH_URL='http://111.207.68.146:8050'
