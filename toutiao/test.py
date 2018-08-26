@@ -28,32 +28,30 @@ from scrapy_splash import SplashRequest
 from scrapy  import Selector
 import time,hashlib,execjs
 #
-# def get_as_cp():
-#     # zz = {}
-#     now = round(time.time())
-#     print(now,type(now))
-#     # 获取计算机时间
-#     e = hex(now).upper()[2:]  # hex()转换一个整数对象为十六进制的字符串表示
-#     print(e)
-#     i = hashlib.md5(str(now).encode('utf-8')).hexdigest().upper()  # hashlib.md5().hexdigest()创建hash对象并返回16进制结果
-#     if len(e) != 8:
-#         zz = {'as': "479BB4B7254C150",
-#               'cp': "7E0AC8874BB0985"}
-#         return zz
-#
-#     n = i[:5]
-#     a = i[-5:]
-#     r = ""
-#     s = ""
-#     for i in range(5):
-#         s = s + n[i] + e[i]
-#     for j in range(5):
-#         r = r + e[j + 3] + a[j]
-#     zz = {
-#         'as': "A1" + s + e[-3:],
-#         'cp': e[0:3] + r + "E1"
-#     }
-#     print(zz)
+def get_as_cp():
+    now = round(time.time())
+    # print(now, type(now))
+    # 获取计算机时间
+    e = hex(now).upper()[2:]  # hex()转换一个整数对象为十六进制的字符串表示
+    # print(e)
+    i = hashlib.md5(str(now).encode('utf-8')).hexdigest().upper()  # hashlib.md5().hexdigest()创建hash对象并返回16进制结果
+    if len(e) != 8:
+        as_ = '479BB4B7254C150'
+        cp = '7E0AC8874BB0985'
+        return now, as_, cp
+    else:
+        n = i[:5]
+        a = i[-5:]
+        r = ""
+        s = ""
+        for i in range(5):
+            s = s + n[i] + e[i]
+        for j in range(5):
+            r = r + e[j + 3] + a[j]
+        as_ = "A1" + s + e[-3:]
+        cp = e[0:3] + r + "E1"
+        print(now, as_, cp)
+        return now, as_, cp
 
 # get_as_cp()
 
@@ -67,6 +65,85 @@ import time,hashlib,execjs
 # res=requests.get(url=url,verify=False).text
 # print(res)
 
-js_file=open('E:/Spider/toutiao/toutiao/signature.js','r').read()
-signature=execjs.compile(js_file)
-si=signature.call('a')
+from selenium import webdriver
+# # 进入浏览器设置
+# options = webdriver.()
+# # 设置中文
+# options.add_argument('lang=zh_CN.UTF-8')
+# options.set_headless()
+# options.add_argument(
+#     'user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"')
+# 设置代理
+# brower = webdriver.PhantomJS()
+# brower.get('https://www.toutiao.com/ch/news_hot/')
+# # a='return TAC.sign('+ str(get_as_cp()[0]) +')'
+# a='return TAC.sign(0)'
+# sinature = brower.execute_script(a)
+# print(sinature)
+# """获取cookie"""
+# cookie = brower.get_cookies()
+# cookie = [item['name'] + "=" + item['value'] for item in cookie]
+# cookiestr = '; '.join(item for item in cookie)
+# brower.quit()
+# print(cookiestr)
+# header1 = {
+#     'Host': 'www.toutiao.com',
+#     'User-Agent': '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"',
+#     'Referer': 'https://www.toutiao.com/ch/news_hot/',
+#     "Cookie": cookiestr
+#
+# }
+# url = 'https://www.toutiao.com/api/pc/feed/?category=news_hot&utm_source=toutiao&widen=1&max_behot_time=0&_signature={}'.format(
+#     sinature)
+# print(url)
+# html = requests.get(url, headers=header1, proxies=func_proxy(), verify=False)
+# print(html.content.decode('unicode_escape'))
+
+from selenium import webdriver
+import requests
+import time
+import json
+
+# 进入浏览器设置
+options = webdriver.ChromeOptions()
+# 设置中文
+options.add_argument('lang=zh_CN.UTF-8')
+options.set_headless()
+options.add_argument('user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"')
+brower = webdriver.Chrome(chrome_options=options)
+
+brower.get('https://www.toutiao.com/ch/news_hot/')
+# 返回秒时间戳
+now = round(time.time())
+sinature = brower.execute_script('return TAC.sign('+str(now)+')')
+# print(sinature)
+# 获取cookie
+cookie = brower.get_cookies()
+cookie = [item['name'] + "=" + item['value'] for item in cookie]
+cookiestr = '; '.join(item for item in cookie)
+# print(cookiestr)
+
+header1 = {
+    'Host': 'www.toutiao.com',
+    'User-Agent': '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"',
+    # 'Referer': 'https://www.toutiao.com/ch/news_hot/',
+    "Cookie": cookiestr
+}
+url = 'https://www.toutiao.com/api/pc/feed/?category=news_hot&utm_source=toutiao&widen=1&max_behot_time='+str(now)+'&_signature={}'.format(
+    sinature)
+# print(url)
+html = requests.get(url, headers=header1,  verify=False)
+brower.quit()
+# json_data=html.content.decode('unicode_escape')
+json_datas=json.loads(html.text)['data']
+for json_data in json_datas:
+    pass
+    print(type(json_data))
+    title= json_data['title']
+    source_url='https://www.toutiao.com/a'+json_data['source_url'][7:]
+    abstract=json_data['abstract']
+    source=json_data['source']
+    tag=json_data['tag']
+    chinese_tag=json_data['chinese_tag']
+    print(title,source_url,source,abstract,source,chinese_tag)
+    # print(item)

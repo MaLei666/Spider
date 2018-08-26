@@ -97,3 +97,6 @@ DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 
 REDIRECT_ENABLED = False
 SPLASH_URL='http://111.207.68.146:8050'
+
+MONGO_URL = 'mongodb://111.207.68.150:27017'
+MONGODB_DATABASE = "toutiao"

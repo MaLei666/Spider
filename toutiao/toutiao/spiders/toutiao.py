@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
-import scrapy,time,hashlib,execjs
+import scrapy,time,hashlib
 from scrapy import Selector
 from toutiao.items import ToutiaoItem
 from scrapy.spiders import CrawlSpider, Rule
-from bs4 import BeautifulSoup
-import requests,re
+import requests,re,json
 from scrapy_splash import SplashRequest
 from urllib.parse import urlencode
+from selenium import webdriver
 
 # 创建一个Spider，必须继承 scrapy.Spider 类
 class comicspider(scrapy.Spider):
-    # 自己定义的内容，在运行工程的时候需要用到的标识；
-    # 用于区别Spider。该名字必须是唯一的，不可以为不同的Spider设定相同的名字。
     name = 'tt'
-    # 允许爬虫访问的域名，防止爬虫跑飞
     allowed_domains=['www.toutiao.com']
-    # start_urls:包含了Spider在启动时进行爬取的url列表。 第一个被获取到的页面将是其中之一。 后续的URL则从初始的URL获取到的数据中提取。
     start_urls=['https://www.toutiao.com']
 
     headers = {
@@ -25,171 +21,89 @@ class comicspider(scrapy.Spider):
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
     }
-    # js_file=open('E:/Spider/toutiao/toutiao/signature.js','r').read()
+
+    # 进入浏览器设置
+    options = webdriver.ChromeOptions()
+    # 设置中文
+    options.add_argument('lang=zh_CN.UTF-8')
+    options.set_headless()
+    options.add_argument(
+        'user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"')
+    brower = webdriver.Chrome(chrome_options=options)
+    ajax_url_base = 'https://www.toutiao.com/api/pc/feed/?'
 
     def start_requests(self):
-        # yield SplashRequest(url=self.start_urls[0],callback=self.sub_nav,splash_headers=self.headers,args={'wait':0.5},)
-        yield scrapy.Request(url=self.start_urls[0],callback=self.sub_nav,headers=self.headers,dont_filter=True)
+        yield SplashRequest(url=self.start_urls[0],callback=self.sub_nav,splash_headers=self.headers,args={'wait':0.5},)
+        # yield scrapy.Request(url=self.start_urls[0],callback=self.sub_nav,headers=self.headers,dont_filter=True)
 
     def sub_nav(self, response):
         page = Selector(response)
+
         # print(response.text)
-        # 所有子标签的``
+        # 所有子标签的url
         sub_nav_tips1=page.xpath('//div[@class="channel"]/ul/li/a/@href').extract()
-        del sub_nav_tips1[:2],sub_nav_tips1[-1]
+        del sub_nav_tips1[:2],sub_nav_tips1[-1],sub_nav_tips1[1]
         sub_nav_tips2=page.xpath('//div[@class="channel-more-layer"]/ul/li/a/@href').extract()
         sub_nav_tips=sub_nav_tips1+sub_nav_tips2
-
+        # print(sub_nav_tips)
+        #子标签的名字
         sub_names1=page.xpath('//div[@class="channel"]/ul/li/a/span/text()').extract()
-        del sub_names1[:2], sub_names1[-1]
+        del sub_names1[:2], sub_names1[-1],sub_names1[1]
         sub_names2=page.xpath('//div[@class="channel-more-layer"]/ul/li/a/span/text()').extract()
         sub_names=sub_names1+sub_names2
+        # print(sub_names)
+        # 每个子标签遍历
+        for i in range(0,len(sub_nav_tips)):
+            items=[]
+            # 请求子标签页面
+            self.brower.get('https://www.toutiao.com' + sub_nav_tips[i])
+            # 返回秒时间戳
+            now = round(time.time())
+            # 获取signature加密数据
+            signature = self.brower.execute_script('return TAC.sign(' + str(now) + ')')
+            # print(signature)
+            # 获取cookie
+            cookie = self.brower.get_cookies()
+            cookie = [item['name'] + "=" + item['value'] for item in cookie]
+            cookiestr = '; '.join(item for item in cookie)
+            # print(cookiestr)
 
-
-        ajax_url_base = 'https://www.toutiao.com/api/pc/feed/?'
-
-        # print(sub_nav_url)
-
-        for sub_nav_tip in sub_nav_tips:
-            # signature=execjs.compile(self.js_file)
-            # si=signature.call('a')
+            header1 = {
+                'Host': 'www.toutiao.com',
+                'User-Agent': '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"',
+                # 'Referer': 'https://www.toutiao.com/ch/news_hot/',
+                "Cookie": cookiestr
+            }
 
             send_data = {
-                'category' : sub_nav_tip[4:-1],
-                'utm_source':'toutiao',
-                'widen':'1',
-                'max_behot_time':self.get_as_cp()[0],
-                'max_behot_time_tmp':self.get_as_cp()[0],
-                'tadrequire':'true',
-                'as':self.get_as_cp()[1],
-                'cp':self.get_as_cp()[2],
-                # '_signature':signature
+                'category': sub_nav_tips[i][4:-1],
+                'utm_source': 'toutiao',
+                'widen': '1',
+                'max_behot_time': now,
+                '_signature': signature
             }
-            url=ajax_url_base+urlencode(send_data)
-            print(url)
-
-            # print(signature)
-
-
-        # for sub_nav_tip in sub_nav_tips:
-        #     sub_nav_tip = sub_nav_tips[4:-1]
-        #     print(sub_nav_tip)
-            # yield SplashRequest(sub_url,callback=self.parse,splash_headers=self.headers,args={'wait':0.5},meta={'sub_nav_urls':sub_nav_urls})
-
-
-    # def parse(self, response):
-    #     sub_nav_urls=response.meta['sub_nav_urls']
-
-
-
-
-
-
-
-    #     hot_list_urls=[]
-    #     self.nav_names=[]
-    #     self.time_tip='/2018-08-20,2018-08-20'
-    #     page = Selector(response)
-    #     # 所有子标签的url
-    #     sub_nav_urls=page.xpath('//ul[@class="sub-nav"]//li/a/@href').extract()
-    #     # print(sub_nav_urls)
-    #     # 测试一个子标签
-    #     # sub_nav_urls=['//www.bilibili.com/v/kichiku/guide/?spm_id_from=333.92.primary_menu.61']
-    #     # 构建所有子标签URL，测试是否具有热度排行的标签，有就保存URL，没有就忽略
-    #     for sub_nav_url in sub_nav_urls:
-    #         self.sub_nav_url = 'https:' + sub_nav_url
-    #         res=requests.get(url=self.sub_nav_url,headers=self.headers).text
-    #         html=BeautifulSoup(res,'lxml')
-    #         # tip = res.xpath('//div[@class="left"]/ul/a[2]/@href').extract()
-    #         tip=html.find_all(href=re.compile('#/all/click/0/1/'))
-    #         # print(tip)
-    #         if len(tip) != 0:
-    #             hot_list_url = self.sub_nav_url + '#/all/click/0/1'+self.time_tip
-    #             hot_list_urls.append(hot_list_url)
-    #             # print(hot_list_urls)
-    #         else:
-    #             sub_nav_urls.remove(sub_nav_url)
-    #     # print(sub_nav_urls)
-    #     print(self.nav_names)
-    #     for i in range(0,len(hot_list_urls)):
-    #         yield SplashRequest(hot_list_urls[i],self.parse0,args={'wait':0.5},splash_headers=self.headers,meta={'hot_list_url':hot_list_urls[i]})
-    #     # print(hot_list_urls)
-    #
-    #
-    # def parse0(self,response):
-    #     # print(response.text)
-    #     page = Selector(response)
-    #     hot_list_url=response.meta['hot_list_url'][:-23]
-    #     all_videos=[]
-    #     print(hot_list_url)
-    #     # video_pages=page.xpath('//ul[@class="pages"]/li[last()-1]//text()').extract()
-    #     try:
-    #         video_pages=int(page.xpath('//ul[@class="pages"]/li[last()-1]//text()').extract()[0])
-    #         # print(video_pages)
-    #         for i in range(1,video_pages+1):
-    #             all_videos.append(hot_list_url+str(i)+self.time_tip)
-    #             # print(hot_url+str(i)+self.time_tip)
-    #         # print(all_videos)
-    #     except:
-    #         all_videos.append(hot_list_url+'1'+self.time_tip)
-    #
-    #     for all_video in all_videos:
-    #         print(all_video)
-    #         yield SplashRequest(all_video,self.parse1,args={'wait':0.5},splash_headers=self.headers)
-    #
-    # def parse1(self, response):
-    #     item = ToutiaoItem()
-    #     page=Selector(response)
-    #     try:
-    #         titles=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/a/text()').extract()
-    #         urls=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/a/@href').extract()
-    #         texts=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/div[@class="v-desc"]/text()').extract()
-    #         peoples=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/div[@class="v-info"]/span[1]/span/text()').extract()
-    #         danmus=page.xpath('//ul[@class="vd-list mod-2"]/li/div/div[2]/div[@class="v-info"]/span[2]/span/text()').extract()
-    #         class_name = page.xpath('//li[@class="on"]/a/text()').extract()
-    #         item['class_name'] = class_name[0]
-    #         for i in range(0,len(titles)):
-    #             item['title'] = self.cleanInput(titles[i])
-    #             item['url'] = urls[i]
-    #             item['text'] = self.cleanInput(texts[i])
-    #             item['people'] = peoples[i]
-    #             item['danmu'] = danmus[i]
-    #             yield item
-    #     except:
-    #         pass
-    #
-    def cleanInput(self,input):
-        input = re.sub('\n+', '', input)
-        input = re.sub(' +', '', input)
-        input = re.sub('\t+', '', input)
-        input = re.sub('\xa0', '', input)
-        # input = bytes(input, 'UTF-8')
-        # input = input.decode('ascii', 'igone')
-        # input = re.sub('\[[0-9]*\]', "", input)
-        return input
-
-    def get_as_cp(self):
-        now = round(time.time())
-        # print(now, type(now))
-        # 获取计算机时间
-        e = hex(now).upper()[2:]  # hex()转换一个整数对象为十六进制的字符串表示
-        # print(e)
-        i = hashlib.md5(str(now).encode('utf-8')).hexdigest().upper()  # hashlib.md5().hexdigest()创建hash对象并返回16进制结果
-        if len(e) != 8:
-            as_ = '479BB4B7254C150'
-            cp = '7E0AC8874BB0985'
-            return as_,cp
-        else:
-            n = i[:5]
-            a = i[-5:]
-            r = ""
-            s = ""
-            for i in range(5):
-                s = s + n[i] + e[i]
-            for j in range(5):
-                r = r + e[j + 3] + a[j]
-            as_= "A1" + s + e[-3:]
-            cp= e[0:3] + r + "E1"
-            return now,as_,cp
-
-
+            # 拼接ajax URL
+            url = self.ajax_url_base + urlencode(send_data)
+            # print(url)
+            html = requests.get(url, headers=header1, verify=False)
+            # 返回json数据，解析
+            json_datas = json.loads(html.text)['data']
+            # print(json_datas)
+            for json_data in json_datas:
+                item = ToutiaoItem()
+                # print(type(json_data))
+                item['title']=json_data['title']
+                # 有的字段为空
+                try:item['source_url']='https://www.toutiao.com/a'+json_data['source_url'][7:]
+                except: item['source_url']=''
+                try:item['abstract']=json_data['abstract']
+                except: item['abstract']=''
+                try:item['source']=json_data['source']
+                except: item['source']=''
+                try:item['tag']=json_data['tag']
+                except:item['tag']=''
+                try:item['chinese_tag']=json_data['chinese_tag']
+                except: item['chinese_tag']='无标签类别'
+                item['news_class']=sub_names[i]
+                yield item
+        self.brower.quit()
