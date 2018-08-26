@@ -31,6 +31,7 @@ class comicspider(scrapy.Spider):
             crawl_url=self.start_urls[0]+nav
             yield scrapy.Request(url=crawl_url, callback=self.parse1)
 
+
     # 解析response 获得文章url
     def parse1(self,response):
         items = []
