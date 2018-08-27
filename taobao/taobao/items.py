@@ -12,8 +12,8 @@ class TaobaoItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     title=scrapy.Field()
-    title=scrapy.Field()
-    title=scrapy.Field()
-    title=scrapy.Field()
-    title=scrapy.Field()
+    comment =scrapy.Field()
+    trade=scrapy.Field()
+    img_url=scrapy.Field()
+    seller=scrapy.Field()
 

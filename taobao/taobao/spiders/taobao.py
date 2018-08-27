@@ -19,7 +19,7 @@ class comicspider(scrapy.Spider):
     # start_urls:包含了Spider在启动时进行爬取的url列表。 第一个被获取到的页面将是其中之一。 后续的URL则从初始的URL获取到的数据中提取。
     start_urls=['https://www.taobao.com']
 
-    headers = {
+    headers1 = {
         'Connection': 'keep-alive',
         'Host': 'www.taobao.com',
         'Accept-Encoding':'gzip, deflate, br',
@@ -29,7 +29,7 @@ class comicspider(scrapy.Spider):
 
     def start_requests(self):
         # yield SplashRequest(self.start_urls[0],self.sub_nav,splash_headers=self.headers,args={'wait':0.5})
-        yield scrapy.Request(url=self.start_urls[0],callback=self.sub_nav,headers=self.headers)
+        yield scrapy.Request(url=self.start_urls[0],callback=self.sub_nav,headers=self.headers1)
 
     def sub_nav(self, response):
         # res=response.text
@@ -39,9 +39,16 @@ class comicspider(scrapy.Spider):
         sub_urls1=page.xpath('//ul[@class="service-bd"]/li[position()<2]/a/@href').extract()
         # print(sub_urls1)
         for sub_url in sub_urls1:
-            yield scrapy.Request(url=sub_url,callback=self.parse0,headers=self.headers,dont_filter=True)
+            yield scrapy.Request(url=sub_url,callback=self.parse0,headers=self.headers1,dont_filter=True)
 
     def parse0(self, response):
+        headers2 = {
+            'Connection': 'keep-alive',
+            'Host': 's.taobao.com',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
+        }
         page=Selector(response)
         sub_navs11=page.xpath('//dl[@class="theme-bd-level2"]/dt/div/a/text()').extract()
         del sub_navs11[-1]
@@ -52,32 +59,44 @@ class comicspider(scrapy.Spider):
             page_urls=[]
             page_urls.append(sub_url)
             s=0
-            for i in range(1,101):
+            # for i in range(1,101):
+            for i in range(1, 2):
+
                 senddata = {
+                    'sort':'sale-desc',
                     'bcoffset': '12',
                     's': s
                 }
                 page_url=sub_url+'&'+ urlencode(senddata)
                 page_urls.append(page_url)
                 s+=60
-            print(page_urls)
+            # print(page_urls)
 
             for page_url in page_urls:
-                yield SplashRequest(page_url,self.parse1,args={'wait':0.5},splash_headers=self.headers,dont_filter=True)
+                yield SplashRequest(page_url,self.parse1,args={'wait':0.5},splash_headers=headers2,dont_filter=True)
                 # yield scrapy.Request(page_url,callback=self.parse1,headers=self.headers,dont_filter=True)
 
 
     def parse1(self, response):
+        headers2 = {
+            'Connection': 'keep-alive',
+            'Host': 'item.taobao.com',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
+        }
         page=Selector(response)
-        goods_urls=page.xpath('//div[@class="grid g-clearfix"]/div[@class="items"]/div/div[3]/div[2]/a/@href').extract()
-        # goods_titles=page.xpath('//div[@class="grid g-clearfix"]/div[@class="items"]/div/div[3]/div[2]/a/text()').extract()
-        print(goods_urls)
+        goods_urls=page.xpath('//div[@class="grid g-clearfix"]/div[@class="items"]/div[position()<3]/div[3]/div[2]/a/@href').extract()
+        # print(goods_urls)
         for goods_url in goods_urls:
-            yield scrapy.Request(goods_url,self.parse2,headers=self.headers,dont_filter=True)
+            goods_url='http:'+goods_url
+            yield scrapy.Request(goods_url,self.parse2,headers=headers2,dont_filter=True)
 
     def parse2(self, response):
+        item=TaobaoItem()
         page=Selector(response)
-        title
+        item['title']=page.xpath('//h3[@class="tb-main-title"]/@data-title').extract()
+        print(item)
 
 
 
