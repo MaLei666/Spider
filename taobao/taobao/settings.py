@@ -56,7 +56,7 @@ SPIDER_MIDDLEWARES = {
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
    # 'taobao.middlewares.TaobaoDownloaderMiddleware': 543,
-    'scrapy_splash.SplashCookiesMiddleware': 723,
+   'scrapy_splash.SplashCookiesMiddleware': 723,
    'scrapy_splash.SplashMiddleware': 725,
    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
 }

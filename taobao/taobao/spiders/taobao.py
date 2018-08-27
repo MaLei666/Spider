@@ -6,6 +6,7 @@ from scrapy.spiders import CrawlSpider, Rule
 from bs4 import BeautifulSoup
 import requests,re
 from scrapy_splash import SplashRequest
+from urllib.parse import urlencode
 
 
 # 创建一个Spider，必须继承 scrapy.Spider 类
@@ -33,43 +34,77 @@ class comicspider(scrapy.Spider):
     def sub_nav(self, response):
         # res=response.text
         page=Selector(response)
-        sub_navs1=page.xpath('//ul[@class="service-bd"]/li[position()<3]/a/text()').extract()
+        sub_navs1=page.xpath('//ul[@class="service-bd"]/li[position()<2]/a/text()').extract()
         # print(sub_navs1)
-        sub_urls1=page.xpath('//ul[@class="service-bd"]/li[position()<3]/a/@href').extract()
+        sub_urls1=page.xpath('//ul[@class="service-bd"]/li[position()<2]/a/@href').extract()
         # print(sub_urls1)
         for sub_url in sub_urls1:
-            yield scrapy.Request(url=sub_url,callback=self.parse0,headers=self.headers,meta={'sub_navs1':sub_navs1})
+            yield scrapy.Request(url=sub_url,callback=self.parse0,headers=self.headers,dont_filter=True)
 
     def parse0(self, response):
         page=Selector(response)
-        sub_navs1=response.meta['sub_navs1']
         sub_navs11=page.xpath('//dl[@class="theme-bd-level2"]/dt/div/a/text()').extract()
+        del sub_navs11[-1]
         sub_urls11=page.xpath('//dl[@class="theme-bd-level2"]/dt/div/a/@href').extract()
+        del sub_urls11[-1]
         # print(sub_navs11,'\n',sub_urls11)
         for sub_url in sub_urls11:
-            print(sub_url)
-            yield SplashRequest(url=sub_url,callback=self.parse1,splash_headers=self.headers)
+            page_urls=[]
+            page_urls.append(sub_url)
+            s=0
+            for i in range(1,101):
+                senddata = {
+                    'bcoffset': '12',
+                    's': s
+                }
+                page_url=sub_url+'&'+ urlencode(senddata)
+                page_urls.append(page_url)
+                s+=60
+            print(page_urls)
+
+            for page_url in page_urls:
+                yield SplashRequest(page_url,self.parse1,args={'wait':0.5},splash_headers=self.headers,dont_filter=True)
+                # yield scrapy.Request(page_url,callback=self.parse1,headers=self.headers,dont_filter=True)
+
 
     def parse1(self, response):
         page=Selector(response)
-        urls=[]
-        s=0
-        pages=page.xpath('[//div[@inner clearfix]/ul[@class="items"/div[1]/text()')[1:-1]
-        print(pages)
-        for i in range(1,int(pages)):
-            url='https://s.taobao.com/list?spm=a217f.8051907.249291-static.1.54af3308Uf46qT&q=%E8%BF%9E%E8%A1%A3%E8%A3%99&style=grid&seller_type=taobao&cps=yes&cat=51108009&bcoffset=12&s='+s
-            s+=60
-            urls.append(url)
-        print(urls)
+        goods_urls=page.xpath('//div[@class="grid g-clearfix"]/div[@class="items"]/div/div[3]/div[2]/a/@href').extract()
+        # goods_titles=page.xpath('//div[@class="grid g-clearfix"]/div[@class="items"]/div/div[3]/div[2]/a/text()').extract()
+        print(goods_urls)
+        for goods_url in goods_urls:
+            yield scrapy.Request(goods_url,self.parse2,headers=self.headers,dont_filter=True)
+
+    def parse2(self, response):
+        page=Selector(response)
+        title
 
 
-# //s.taobao.com/list?spm=a217f.8051907.249291-static.1.54af3308Uf46qT&q=%E8%BF%9E%E8%A1%A3%E8%A3%99&style=grid&seller_type=taobao&cps=yes&cat=51108009
-#
-# //s.taobao.com/list?spm=a217f.8051907.249291-static.1.54af3308Uf46qT&q=%E8%BF%9E%E8%A1%A3%E8%A3%99&style=grid&seller_type=taobao&cps=yes&cat=51108009&bcoffset=12&s=60
-#
-# //s.taobao.com/list?spm=a217f.8051907.249291-static.1.54af3308Uf46qT&q=%E8%BF%9E%E8%A1%A3%E8%A3%99&style=grid&seller_type=taobao&cps=yes&cat=51108009&bcoffset=12&s=120
-#
-# //s.taobao.com/list?spm=a217f.8051907.249291-static.1.54af3308Uf46qT&q=%E8%BF%9E%E8%A1%A3%E8%A3%99&style=grid&seller_type=taobao&cps=yes&cat=51108009&bcoffset=12&s=180
-#
-# //s.taobao.com/list?spm=a217f.8051907.249291-static.1.54af3308Uf46qT&q=%E8%BF%9E%E8%A1%A3%E8%A3%99&style=grid&seller_type=taobao&cps=yes&cat=51108009&bcoffset=12&s=240
+
+    def cleanInput(self, input):
+        input = re.sub('\n+', '', input)
+        input = re.sub(' +', '', input)
+        input = re.sub('\t+', '', input)
+        input = re.sub('\xa0', '', input)
+        # input = bytes(input, 'UTF-8')
+        # input = input.decode('ascii', 'igone')
+        # input = re.sub('\[[0-9]*\]', "", input)
+        return input
+
+            # print(sub_url)
+            # url='https://s.taobao.com/list?q=%E6%AF%9B%E9%92%88%E7%BB%87%E8%A1%AB&cat=16&style=grid&seller_type=taobao&spm=a217f.1215286.1000187.1'
+    #         yield SplashRequest(sub_url,self.parse1,args={'wait':0.5},splash_headers=self.headers,meta={'sub_url':sub_url},dont_filter=True)
+    #
+    # def parse1(self, response):
+    #     page=Selector(response)
+    #     sub_url11=response.meta['sub_url']
+    #     print(sub_url11)
+
+        # pages=page.xpath('//div[@class="inner clearfix"]/div[1]/text()').extract()
+        # print(pages)
+
+
+
+
+
 
