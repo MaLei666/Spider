@@ -34,7 +34,8 @@ class comicspider(scrapy.Spider):
     def sub_nav(self, response):
         # res=response.text
         page=Selector(response)
-        sub_navs1=page.xpath('//ul[@class="service-bd"]/li[position()<2]/a/text()').extract()
+        # 女装、男装、内衣
+        # sub_navs1=page.xpath('//ul[@class="service-bd"]/li[position()<2]/a/text()').extract()
         # print(sub_navs1)
         sub_urls1=page.xpath('//ul[@class="service-bd"]/li[position()<2]/a/@href').extract()
         # print(sub_urls1)
@@ -50,30 +51,34 @@ class comicspider(scrapy.Spider):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
         }
         page=Selector(response)
+        # 连衣裙、毛衫/内搭、秋外套……
         sub_navs11=page.xpath('//dl[@class="theme-bd-level2"]/dt/div/a/text()').extract()
         del sub_navs11[-1]
         sub_urls11=page.xpath('//dl[@class="theme-bd-level2"]/dt/div/a/@href').extract()
         del sub_urls11[-1]
         # print(sub_navs11,'\n',sub_urls11)
-        for sub_url in sub_urls11:
+        # for sub_url in sub_urls11:
+        for i in range(0,len(sub_urls11)):
             page_urls=[]
-            page_urls.append(sub_url)
+            page_urls.append(sub_urls11[i]+'&sort=sale-desc')
             s=0
-            # for i in range(1,101):
-            for i in range(1, 2):
-
+            sub_nav=sub_navs11[i]
+            # for j in range(1,101):
+            for j in range(0, 1):
                 senddata = {
                     'sort':'sale-desc',
-                    'bcoffset': '12',
+                    'bcoffset': '0',
                     's': s
                 }
-                page_url=sub_url+'&'+ urlencode(senddata)
+                page_url=sub_urls11[i]+'&'+ urlencode(senddata)
                 page_urls.append(page_url)
                 s+=60
             # print(page_urls)
 
             for page_url in page_urls:
-                yield SplashRequest(page_url,self.parse1,args={'wait':0.5},splash_headers=headers2,dont_filter=True)
+                # self.goods_class = re.compile(u'[^\u4E00-\u9FA5]').sub(r'', page_url)
+                # print(page_url,self.goods_class)
+                yield SplashRequest(page_url,self.parse1,args={'wait':0.5},splash_headers=headers2,dont_filter=True,meta={'sub_nav':sub_nav})
                 # yield scrapy.Request(page_url,callback=self.parse1,headers=self.headers,dont_filter=True)
 
 
@@ -86,29 +91,42 @@ class comicspider(scrapy.Spider):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
         }
         page=Selector(response)
-        goods_urls=page.xpath('//div[@class="grid g-clearfix"]/div[@class="items"]/div[position()<3]/div[3]/div[2]/a/@href').extract()
+        # 每页取两个来测试
+        goods_urls=page.xpath('//div[@class="grid g-clearfix"]/div[@class="items"]/div[position()<2]/div[3]/div[2]/a/@href').extract()
+        # goods_class=page.xpath('//div[@class="grid g-clearfix"]/div[@class="items"]/div[1]/div[3]/div[2]/a/span[@class="H"]/text()').extract()
+        goods_class=response.meta['sub_nav']
         # print(goods_urls)
         for goods_url in goods_urls:
             goods_url='http:'+goods_url
-            yield scrapy.Request(goods_url,self.parse2,headers=headers2,dont_filter=True)
+            # yield scrapy.Request(goods_url,self.parse2,headers=headers2,dont_filter=True)
+            yield SplashRequest(goods_url,self.parse2,splash_headers=headers2,dont_filter=True,args={'wait':1},meta={'goods_url':goods_url,'goods_class':goods_class})
 
     def parse2(self, response):
         item=TaobaoItem()
         page=Selector(response)
-        item['title']=page.xpath('//h3[@class="tb-main-title"]/@data-title').extract()
-        print(item)
+        # print(response.text)
+        item['title']=page.xpath('//head/title/text()').extract()[0][:-4]
+        item['goods_url']=response.meta['goods_url']
+        item['goods_class']=response.meta['goods_class']
+        item['price']=page.xpath('//strong[@id="J_StrPrice"]/em[@class="tb-rmb-num"]/text()').extract()[0]
+        item['comment']=page.xpath('//strong[@id="J_RateCounter"]/text()').extract()[0]
+        # item['trade']=page.xpath('//div[@class="tb-sell-counter"]/a/strong/text()').extract()
+        try:
+            item['img_url']=page.xpath('//li[@data-index="0"]/div/a/img/@src').extract()[0]
+        except:
+            item['img_url']='无'
+
+        try:
+            item['seller']=page.xpath('//div[@class="tb-shop-name"]/dl/dd/strong/a/@title').extract()[0]
+        except IndexError:
+            item['seller']=page.xpath('//span[@class="shop-name-title"]/@title').extract()[0]
+        except:
+            item['seller']='未知'
+
+        # print(item)
+        yield item
 
 
-
-    def cleanInput(self, input):
-        input = re.sub('\n+', '', input)
-        input = re.sub(' +', '', input)
-        input = re.sub('\t+', '', input)
-        input = re.sub('\xa0', '', input)
-        # input = bytes(input, 'UTF-8')
-        # input = input.decode('ascii', 'igone')
-        # input = re.sub('\[[0-9]*\]', "", input)
-        return input
 
             # print(sub_url)
             # url='https://s.taobao.com/list?q=%E6%AF%9B%E9%92%88%E7%BB%87%E8%A1%AB&cat=16&style=grid&seller_type=taobao&spm=a217f.1215286.1000187.1'
