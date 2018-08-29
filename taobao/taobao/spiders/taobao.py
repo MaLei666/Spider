@@ -79,11 +79,11 @@ class comicspider(scrapy.Spider):
                 # self.goods_class = re.compile(u'[^\u4E00-\u9FA5]').sub(r'', page_url)
                 # print(page_url,self.goods_class)
                 yield SplashRequest(page_url,self.parse1,args={'wait':0.5},splash_headers=headers2,dont_filter=True,meta={'sub_nav':sub_nav})
-                # yield scrapy.Request(page_url,callback=self.parse1,headers=self.headers,dont_filter=True)
+                # yield scrapy.Request(page_url,callback=self.parse1,headers=headers2,dont_filter=True,meta={'sub_nav':sub_nav})
 
 
     def parse1(self, response):
-        headers2 = {
+        headers3 = {
             'Connection': 'keep-alive',
             'Host': 'item.taobao.com',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -98,8 +98,8 @@ class comicspider(scrapy.Spider):
         # print(goods_urls)
         for goods_url in goods_urls:
             goods_url='http:'+goods_url
-            # yield scrapy.Request(goods_url,self.parse2,headers=headers2,dont_filter=True)
-            yield SplashRequest(goods_url,self.parse2,splash_headers=headers2,dont_filter=True,args={'wait':1},meta={'goods_url':goods_url,'goods_class':goods_class})
+            yield scrapy.Request(goods_url,self.parse2,headers=headers3,dont_filter=True,meta={'goods_url':goods_url,'goods_class':goods_class})
+            # yield SplashRequest(goods_url,self.parse2,splash_headers=headers2,dont_filter=True,args={'wait':1},meta={'goods_url':goods_url,'goods_class':goods_class})
 
     def parse2(self, response):
         item=TaobaoItem()
