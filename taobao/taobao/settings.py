@@ -98,8 +98,8 @@ DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 # REDIRECT_ENABLED = False
 SPLASH_URL='http://111.207.68.150:8050'
 
-MONGO_URL = 'mongodb://111.207.68.150:27017'
-MONGODB_DATABASE = "taobao"
+# REDIS_URL='redis://:zkyr1006@111.207.68.150:6379/1'
+
 
 # 遇到502，504，重复请求
 RETRY_HTTP_CODES = [502, 504]

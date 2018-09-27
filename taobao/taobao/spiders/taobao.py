@@ -128,18 +128,6 @@ class comicspider(scrapy.Spider):
 
 
 
-            # print(sub_url)
-            # url='https://s.taobao.com/list?q=%E6%AF%9B%E9%92%88%E7%BB%87%E8%A1%AB&cat=16&style=grid&seller_type=taobao&spm=a217f.1215286.1000187.1'
-    #         yield SplashRequest(sub_url,self.parse1,args={'wait':0.5},splash_headers=self.headers,meta={'sub_url':sub_url},dont_filter=True)
-    #
-    # def parse1(self, response):
-    #     page=Selector(response)
-    #     sub_url11=response.meta['sub_url']
-    #     print(sub_url11)
-
-        # pages=page.xpath('//div[@class="inner clearfix"]/div[1]/text()').extract()
-        # print(pages)
-
 
 
 
