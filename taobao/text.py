@@ -13,12 +13,6 @@ import requests
 # page=requests.get(url,headers=headers)
 # print(page.text)
 import re
-# string='https://s.taobao.com/list?q=外套&cat=50344007&style=grid&seller_type=taobao&sort=sale-desc'
-# # string = string.decode("utf-8")
-# filtrate = re.compile(u'[^\u4E00-\u9FA5]')
-# filtered_str = filtrate.sub(r'', string)#replace
-# print (filtered_str)
-
 # Start your middleware class
 class ProxyMiddleware(object):
     # overwrite process request

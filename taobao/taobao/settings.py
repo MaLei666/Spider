@@ -96,10 +96,11 @@ HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 
 # REDIRECT_ENABLED = False
-SPLASH_URL='http://111.207.68.150:8050'
+SPLASH_URL='http://localhost:8050'
 
-# REDIS_URL='redis://:zkyr1006@111.207.68.150:6379/1'
-
+# REDIS_URL='redis://:zkyr1006@localhost:6379/1'
+MONGO_URL = 'mongodb://admin:zkyr1006@localhost:28018'
+MONGO_DB='taobao'
 
 # 遇到502，504，重复请求
 RETRY_HTTP_CODES = [502, 504]

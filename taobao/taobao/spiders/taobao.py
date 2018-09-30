@@ -63,8 +63,8 @@ class comicspider(scrapy.Spider):
             page_urls.append(sub_urls11[i]+'&sort=sale-desc')
             s=0
             sub_nav=sub_navs11[i]
-            # for j in range(1,101):
-            for j in range(0, 1):
+            for j in range(1,20):
+            # for j in range(0, 1):
                 senddata = {
                     'sort':'sale-desc',
                     'bcoffset': '0',
@@ -76,8 +76,6 @@ class comicspider(scrapy.Spider):
             # print(page_urls)
 
             for page_url in page_urls:
-                # self.goods_class = re.compile(u'[^\u4E00-\u9FA5]').sub(r'', page_url)
-                # print(page_url,self.goods_class)
                 yield SplashRequest(page_url,self.parse1,args={'wait':0.5},splash_headers=headers2,dont_filter=True,meta={'sub_nav':sub_nav})
                 # yield scrapy.Request(page_url,callback=self.parse1,headers=headers2,dont_filter=True,meta={'sub_nav':sub_nav})
 
@@ -91,15 +89,22 @@ class comicspider(scrapy.Spider):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
         }
         page=Selector(response)
-        # 每页取两个来测试
-        goods_urls=page.xpath('//div[@class="grid g-clearfix"]/div[@class="items"]/div[position()<2]/div[3]/div[2]/a/@href').extract()
+        goods_urls=page.xpath('//div[@class="grid g-clearfix"]/div[@class="items"]/div/div[3]/div[2]/a/@href').extract()
         # goods_class=page.xpath('//div[@class="grid g-clearfix"]/div[@class="items"]/div[1]/div[3]/div[2]/a/span[@class="H"]/text()').extract()
         goods_class=response.meta['sub_nav']
+        areas = page.xpath('//div[@class="row row-3 g-clearfix"]/div[@class="location"]/text()').extract()
+        sell_counts=page.xpath('//div[@class="deal-cnt"]/text()').extract()
+
         # print(goods_urls)
-        for goods_url in goods_urls:
-            goods_url='http:'+goods_url
-            yield scrapy.Request(goods_url,self.parse2,headers=headers3,dont_filter=True,meta={'goods_url':goods_url,'goods_class':goods_class})
-            # yield SplashRequest(goods_url,self.parse2,splash_headers=headers2,dont_filter=True,args={'wait':1},meta={'goods_url':goods_url,'goods_class':goods_class})
+        for i in range(0,len(goods_urls)):
+            area=areas[i]
+            sell_count=sell_counts[i]
+            goods_url='http:'+goods_urls[i]
+            yield scrapy.Request(goods_url,self.parse2,headers=headers3,dont_filter=True,
+                                 meta={'goods_url':goods_url,
+                                       'goods_class':goods_class,
+                                       'area':area,
+                                       'sell_count':sell_count})
 
     def parse2(self, response):
         item=TaobaoItem()
@@ -109,22 +114,25 @@ class comicspider(scrapy.Spider):
         item['goods_url']=response.meta['goods_url']
         item['goods_class']=response.meta['goods_class']
         item['price']=page.xpath('//strong[@id="J_StrPrice"]/em[@class="tb-rmb-num"]/text()').extract()[0]
-        item['comment']=page.xpath('//strong[@id="J_RateCounter"]/text()').extract()[0]
+        item['sell_count']=response.meta['sell_count'][:-3]
+        item['area']=response.meta['area']
         # item['trade']=page.xpath('//div[@class="tb-sell-counter"]/a/strong/text()').extract()
-        try:
-            item['img_url']=page.xpath('//li[@data-index="0"]/div/a/img/@src').extract()[0]
-        except:
-            item['img_url']='无'
+        seller= page.xpath('//div[@class="tb-shop-name"]/dl/dd/strong/a/@title').extract()
+        if len(seller)==1:
+            item['seller']=seller[0]
+        else:
+            seller=page.xpath('//span[@class="shop-name-title"]/@title').extract()
+            if len(seller)==1:
+                item['seller'] = seller[0]
+            else:
+                seller = page.xpath('//span[@class="shop-name-title"]/@title').extract()
+                if len(seller) == 1:
+                    item['seller'] = seller[0]
+                else:
+                    item['seller'] = '未知'
 
-        try:
-            item['seller']=page.xpath('//div[@class="tb-shop-name"]/dl/dd/strong/a/@title').extract()[0]
-        except IndexError:
-            item['seller']=page.xpath('//span[@class="shop-name-title"]/@title').extract()[0]
-        except:
-            item['seller']='未知'
-
-        # print(item)
         yield item
+
 
 
 
