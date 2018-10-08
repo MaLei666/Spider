@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import scrapy
+import scrapy,numpy
 from scrapy import Selector
 from taobao.items import TaobaoItem
 from scrapy.spiders import CrawlSpider, Rule
@@ -9,14 +9,9 @@ from scrapy_splash import SplashRequest
 from urllib.parse import urlencode
 
 
-# 创建一个Spider，必须继承 scrapy.Spider 类
 class comicspider(scrapy.Spider):
-    # 自己定义的内容，在运行工程的时候需要用到的标识；
-    # 用于区别Spider。该名字必须是唯一的，不可以为不同的Spider设定相同的名字。
     name = 'tb'
-    # 允许爬虫访问的域名，防止爬虫跑飞
     allowed_domains=['www.taobao.com']
-    # start_urls:包含了Spider在启动时进行爬取的url列表。 第一个被获取到的页面将是其中之一。 后续的URL则从初始的URL获取到的数据中提取。
     start_urls=['https://www.taobao.com']
 
     headers1 = {
@@ -28,11 +23,9 @@ class comicspider(scrapy.Spider):
     }
 
     def start_requests(self):
-        # yield SplashRequest(self.start_urls[0],self.sub_nav,splash_headers=self.headers,args={'wait':0.5})
         yield scrapy.Request(url=self.start_urls[0],callback=self.sub_nav,headers=self.headers1)
 
     def sub_nav(self, response):
-        # res=response.text
         page=Selector(response)
         # 女装、男装、内衣
         # sub_navs1=page.xpath('//ul[@class="service-bd"]/li[position()<2]/a/text()').extract()
@@ -56,8 +49,6 @@ class comicspider(scrapy.Spider):
         del sub_navs11[-1]
         sub_urls11=page.xpath('//dl[@class="theme-bd-level2"]/dt/div/a/@href').extract()
         del sub_urls11[-1]
-        # print(sub_navs11,'\n',sub_urls11)
-        # for sub_url in sub_urls11:
         for i in range(0,len(sub_urls11)):
             page_urls=[]
             page_urls.append(sub_urls11[i]+'&sort=sale-desc')
@@ -78,7 +69,6 @@ class comicspider(scrapy.Spider):
             for page_url in page_urls:
                 yield SplashRequest(page_url,self.parse1,args={'wait':0.5},splash_headers=headers2,dont_filter=True,meta={'sub_nav':sub_nav})
                 # yield scrapy.Request(page_url,callback=self.parse1,headers=headers2,dont_filter=True,meta={'sub_nav':sub_nav})
-
 
     def parse1(self, response):
         headers3 = {
@@ -132,7 +122,6 @@ class comicspider(scrapy.Spider):
                     item['seller'] = '未知'
 
         yield item
-
 
 
 
