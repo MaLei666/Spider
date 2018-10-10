@@ -9,6 +9,9 @@ from pymongo import MongoClient
 from  matplotlib import pyplot as plt
 import re,json
 from collections import Counter
+# matprotlib显示中文
+from pylab import *
+mpl.rcParams['font.sans-serif'] = ['SimHei']
 
 def data_analysis():
     sell_count = []
@@ -24,32 +27,25 @@ def data_analysis():
     return provience
     # print(provience)
 
-
-
+def check():
+    provience=data_analysis()
+    a={}
+    for i in provience:
+        a[i]=provience.count(i)
+    prov=list(a.keys())
+    nums=list(a.values())
+    return prov,nums
 
 def plot():
-    provience=np.array(data_analysis())
-    a=str(Counter(provience))[8:-1]
-    
-    print(a)
-    # print(np.array(a))
-    # plt.figure(figsize=(8,4))
-    #
-    # plt.xticks(rotation=0)
-    # plt.xlabel('省份')
-    # plt.ylabel('数量')
-    # plt.title('不同省份数量分布图')
-    # plt.show()
+    prov,nums=check()
 
-
-
-
-
-
-
-
-
-
-
+    plt.figure(figsize=(8,4))
+    plt.xticks(rotation=0)
+    plt.bar(prov,nums,color='g')
+    plt.xlabel('省份')
+    plt.ylabel('数量')
+    plt.title('不同省份数量分布图')
+    plt.legend()
+    plt.show()
 
 plot()
