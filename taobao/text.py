@@ -13,8 +13,36 @@ import requests
 # page=requests.get(url,headers=headers)
 # print(page.text)
 import re
-string='https://s.taobao.com/list?q=外套&cat=50344007&style=grid&seller_type=taobao&sort=sale-desc'
-# string = string.decode("utf-8")
-filtrate = re.compile(u'[^\u4E00-\u9FA5]')
-filtered_str = filtrate.sub(r'', string)#replace
-print (filtered_str)
+# Start your middleware class
+class ProxyMiddleware(object):
+    # overwrite process request
+    def process_request(self, request, spider):
+        # Set the location of the proxy
+        request.meta['proxy'] =self.proxy_test()
+
+    def proxy_test(self):
+        # ....
+        def get_proxy():
+            return requests.get("http://111.207.68.150:8001/get/").text
+
+        def delete_proxy(proxy):
+            requests.get("http://111.207.68.150:8001/delete/?proxy={}".format(proxy))
+
+        proxy = "http://{}".format(get_proxy())
+        try:
+            requests.get('https://www.baidu.com', proxies={"proxy": proxy})
+            print(proxy,'代理可用')
+            # 使用代理访问
+            return proxy
+        except Exception:
+            # 出错1次, 删除代理池中代理
+            delete_proxy(proxy)
+            return None
+
+DOWNLOADER_MIDDLEWARES = {
+   # 'taobao.middlewares.TaobaoDownloaderMiddleware': 543,
+   'scrapy_splash.SplashCookiesMiddleware': 723,
+   'scrapy_splash.SplashMiddleware': 725,
+   'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
+   'taobao.middlewares.ProxyMiddleware': 100,
+}

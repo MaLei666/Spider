@@ -20,7 +20,9 @@
 
 ## 7. toutiao 	
 爬取今日头条子标签新闻，webdriver获取加密参数，ajax请求返回json数据解析，保存至MongoDB
-	
-## matplotlib测试.py 	
 
-## scrapyd 	docker scrapyd 配置文件 	
+## 8. taobao
+爬取淘宝各子标签，按销量排名商品信息，按分类保存至MongoDB
+
+## scrapyd 	
+docker scrapyd 配置文件 	
