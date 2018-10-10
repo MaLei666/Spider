@@ -22,7 +22,7 @@
 爬取今日头条子标签新闻，webdriver获取加密参数，ajax请求返回json数据解析，保存至MongoDB
 
 ## 8. taobao
-爬取淘宝各子标签，按销量排名商品信息，按分类保存至MongoDB
+爬取淘宝各子标签，按销量排名商品信息，按分类保存至MongoDB，通过数据分析，将商品在各省分布、销量排行、地图分布等通过matplotlib绘图显示
 
 ## scrapyd 	
 docker scrapyd 配置文件 	
