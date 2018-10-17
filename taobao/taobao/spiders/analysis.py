@@ -13,6 +13,7 @@ from wordcloud import WordCloud
 # matprotlib显示中文
 from pylab import *
 mpl.rcParams['font.sans-serif'] = ['SimHei']
+import seaborn as sns
 
 # 从mongodb中获取数据
 def data_analysis(parameter):
@@ -27,22 +28,22 @@ def data_analysis(parameter):
     # print(provience)
 
 # 商品所属省份分布柱状图
-def prov_plt():
-    def provience():
-        data=[]
-        provs=data_analysis('area')
-        # print(provience)
-        for each in provs:
-            prov = (each.split())[0]
-            data.append(prov)
-        count={}
-        for i in data:
-            count[i]=data.count(i)
-        print(count)
-        prov=list(count.keys())
-        nums=list(count.values())
-        return prov,nums
+def provience():
+    data=[]
+    provs=data_analysis('area')
+    # print(provience)
+    for each in provs:
+        prov = (each.split())[0]
+        data.append(prov)
+    count={}
+    for i in data:
+        count[i]=data.count(i)
+    # print(count)
+    prov=list(count.keys())
+    nums=list(count.values())
+    return prov,nums
 
+def prov_plt():
     prov, nums = provience()
     plt.figure(figsize=(8, 4))
     plt.xticks(rotation=0)
@@ -150,6 +151,69 @@ def cloud_plt():
     plt.show()
 
 
-cloud_plt()
+def impact_analysis():
+    sell_count=pandas.DataFrame({'sell_count': data_analysis('sell_count')})
+    price=[]
+    for i in data_analysis('price'):
+        p=i.split('-')
+        p_i=p[0].split('.')
+        price.append(p_i[0])
+    price=pandas.DataFrame({'price':price})
+    infos=pandas.concat([sell_count, price], axis=1, ignore_index=True)
+    infos.columns = ['sell_count', 'price'] #一定注意定义到columns
+    infos['sell_count']=infos.sell_count.astype('int')
+    infos['price']=infos.sell_count.astype('int')
+    infos['GMV']=infos['sell_count']*infos['price']
+    sns.regplot(x='price',y='GMV',data=infos)
+    # sns.lmplot(x='price',y='GMV',data=infos,x_jitter=.05)
+    plt.show()
+
+
+def mean_sale():
+    prov,nums=provience()
+    sell_count = data_analysis('sell_count')
+    areas=[]
+    count=[]
+    for i in data_analysis('area'):
+        areas.append((i.split(' '))[0])
+    # print(areas)
+    # print(prov)
+    for each in prov:
+        counts=[]
+        for i in range(0,len(areas)):
+            if each==areas[i]:
+                counts.append(int(sell_count[i]))
+            else:
+                pass
+        count.append(sum(counts))
+    # print(count)
+    count=pandas.DataFrame(count)
+    prov=pandas.DataFrame(prov)
+    nums=pandas.DataFrame(nums)
+    data = pandas.concat([nums,count], axis=1, ignore_index=True)
+    data.columns = ['nums','count']
+    data['nums']=data.nums.astype('int')
+    m_l=data['count']/data['nums']
+    mean=[]
+    for each in m_l:
+        mean.append(str(each).split('.')[0])
+    mean=pandas.DataFrame(mean)
+    print(mean)
+    infos = pandas.concat([prov,mean], axis=1, ignore_index=True)
+    infos.columns = ['prov','mean']
+    infos['mean']=infos.mean.astype('int')
+    # infos.sort_values('mean',inplace=True,ascending=False)
+    print(infos.dtype)
+    infos.reset_index()
+    print(infos)
+    index=np.arange(infos.mean.size)
+    plt.bar(infos.prov,infos.mean)
+    plt.xticks(index,infos.mean)
+    plt.xlabel('省份')
+    plt.ylabel('平均销量')
+    plt.title('不同省份销量分布')
+    plt.show()
+
+mean_sale()
 
 
