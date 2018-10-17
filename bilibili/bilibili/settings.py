@@ -95,11 +95,11 @@ ITEM_PIPELINES = {
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 
-MONGO_URL = 'mongodb://111.207.68.150:27017'
+MONGO_URL = 'mongodb://localhost:27017'
 MONGODB_DATABASE = "blbl"
 
 REDIRECT_ENABLED = False
-SPLASH_URL='http://111.207.68.150:8050'
+SPLASH_URL='http://localhost:8050'
 
 # SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 # REDIS_URL = 'redis://:zkyr1006@111.207.68.150:6379'
