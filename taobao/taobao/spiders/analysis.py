@@ -10,10 +10,13 @@ from  matplotlib import pyplot as plt
 import re,json,jieba,pandas
 from collections import Counter
 from wordcloud import WordCloud
+import seaborn as sns
+import folium
+import webbrowser
+from folium.plugins import HeatMap
 # matprotlib显示中文
 from pylab import *
 mpl.rcParams['font.sans-serif'] = ['SimHei']
-import seaborn as sns
 
 # 从mongodb中获取数据
 def data_analysis(parameter):
@@ -164,6 +167,7 @@ def impact_analysis():
     infos['sell_count']=infos.sell_count.astype('int')
     infos['price']=infos.sell_count.astype('int')
     infos['GMV']=infos['sell_count']*infos['price']
+    # print(infos.GMV.dtype)
     sns.regplot(x='price',y='GMV',data=infos)
     # sns.lmplot(x='price',y='GMV',data=infos,x_jitter=.05)
     plt.show()
@@ -183,37 +187,36 @@ def mean_sale():
         for i in range(0,len(areas)):
             if each==areas[i]:
                 counts.append(int(sell_count[i]))
-            else:
-                pass
         count.append(sum(counts))
     # print(count)
-    count=pandas.DataFrame(count)
-    prov=pandas.DataFrame(prov)
-    nums=pandas.DataFrame(nums)
+    count=pandas.DataFrame({'count':count})
+    prov=pandas.DataFrame({'prov':prov})
+    nums=pandas.DataFrame({'nums':nums})
     data = pandas.concat([nums,count], axis=1, ignore_index=True)
     data.columns = ['nums','count']
     data['nums']=data.nums.astype('int')
     m_l=data['count']/data['nums']
-    mean=[]
+    mean_list=[]
     for each in m_l:
-        mean.append(str(each).split('.')[0])
-    mean=pandas.DataFrame(mean)
-    print(mean)
-    infos = pandas.concat([prov,mean], axis=1, ignore_index=True)
-    infos.columns = ['prov','mean']
-    infos['mean']=infos.mean.astype('int')
-    # infos.sort_values('mean',inplace=True,ascending=False)
-    print(infos.dtype)
-    infos.reset_index()
+        each=str(each).split('.')
+        mean_list.append(each[0])
+    mean_list=pandas.DataFrame({'mean_list':mean_list},dtype=np.int)
+    infos = pandas.concat([prov,mean_list], axis=1, ignore_index=True)
+    infos.columns = ['prov','mean_list']
+    infos['mean_list']=infos.mean_list.astype('int')
+    infos.sort_values('mean_list',inplace=True,ascending=False)
+    infos=infos.reset_index()
+    index=np.arange(infos.mean_list.size)
     print(infos)
-    index=np.arange(infos.mean.size)
-    plt.bar(infos.prov,infos.mean)
-    plt.xticks(index,infos.mean)
+    plt.figure(figsize=(8,4))
+    plt.bar(index,infos.mean_list,color='purple')
+    plt.xticks(index,infos.prov,rotation=0)
     plt.xlabel('省份')
     plt.ylabel('平均销量')
     plt.title('不同省份销量分布')
     plt.show()
 
-mean_sale()
+# mean_sale()
 
+def hot_map():
 
