@@ -11,9 +11,6 @@ import re,json,jieba,pandas
 from collections import Counter
 from wordcloud import WordCloud
 import seaborn as sns
-import folium
-import webbrowser
-from folium.plugins import HeatMap
 # matprotlib显示中文
 from pylab import *
 mpl.rcParams['font.sans-serif'] = ['SimHei']
@@ -172,7 +169,6 @@ def impact_analysis():
     # sns.lmplot(x='price',y='GMV',data=infos,x_jitter=.05)
     plt.show()
 
-
 def mean_sale():
     prov,nums=provience()
     sell_count = data_analysis('sell_count')
@@ -180,8 +176,6 @@ def mean_sale():
     count=[]
     for i in data_analysis('area'):
         areas.append((i.split(' '))[0])
-    # print(areas)
-    # print(prov)
     for each in prov:
         counts=[]
         for i in range(0,len(areas)):
@@ -216,7 +210,7 @@ def mean_sale():
     plt.title('不同省份销量分布')
     plt.show()
 
-# mean_sale()
+mean_sale()
 
-def hot_map():
+# def hot_map():
 
