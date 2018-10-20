@@ -25,15 +25,16 @@ import numpy as np
 # c = b.copy(order='F')   #以 F 风格顺序排序
 # for x in np.nditer(c):
 #     print(x)
+import pandas as pd
+# 查看每一列的数据类型
 
-import numpy as np
-a = np.array([0,30,45,60,90])
-print  '不同角度的正弦值：'
-# 通过乘 pi/180 转化为弧度
-print np.sin(a*np.pi/180)
-print  '\n'
-print  '数组中角度的余弦值：'
-print np.cos(a*np.pi/180)
-print  '\n'
-print  '数组中角度的正切值：'
-print np.tan(a*np.pi/180)
+names = ['Bob','Jessica','Mary','John','Mel','John','Mel']
+births = [968, 155, 77, 578, 973, 578, 973]
+data=list(zip(names,births))
+df=pd.DataFrame(data=data,columns=['names','births'])
+# 查看每一列的数据类型
+print df.dtypes
+# 查看指定列的数据类型
+print df
+
+
