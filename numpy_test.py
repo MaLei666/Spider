@@ -28,13 +28,41 @@ import numpy as np
 import pandas as pd
 # 查看每一列的数据类型
 
-names = ['Bob','Jessica','Mary','John','Mel','John','Mel']
-births = [968, 155, 77, 578, 973, 578, 973]
-data=list(zip(names,births))
-df=pd.DataFrame(data=data,columns=['names','births'])
-# 查看每一列的数据类型
-print df.dtypes
-# 查看指定列的数据类型
+# names = ['Bob','Jessica','Mary','John','Mel','John','Mel']
+# births = [968, 155, 77, 578, 973, 578, 973]
+# data=list(zip(names,births))
+# df=pd.DataFrame(data=data,columns=['names','births'])
+# # 查看每一列的数据类型
+# print df.dtypes
+# # 查看指定列的数据类型
+# print df
+
+# d = {'one':[1,1,1,1,1],
+#      'two':[2,2,2,2,2],
+#      'letter':['a','a','b','b','c']}
+#
+# # 创建一个 dataframe
+# df = pd.DataFrame(d)
+# print df
+#
+# one=df.groupby('letter')
+# two=df.groupby(['letter','one']).sum()
+# # 不把用来分组的列名作为索引
+# three=df.groupby(['letter','one'],as_index=False).sum()
+# print one.sum()
+# print two
+# # 输出索引
+# print two.index
+# print three.index
+
+
+d1 = {'one':[1,1],
+     'two':[2,2],
+     'letter':['a','b']}
+d2 = {'one':[1,1],
+     'two':[2,2],
+     'letter':['a','b']}
+d1=pd.DataFrame(d1,columns=['d1'])
+d2=pd.DataFrame(d2,columns=['d2'])
+df=pd.concat([d1,d2])
 print df
-
-
