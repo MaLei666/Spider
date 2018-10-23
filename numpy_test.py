@@ -56,13 +56,41 @@ import pandas as pd
 # print three.index
 
 
-d1 = {'one':[1,1],
-     'two':[2,2],
-     'letter':['a','b']}
-d2 = {'one':[1,1],
-     'two':[2,2],
-     'letter':['a','b']}
-d1=pd.DataFrame(d1,columns=['d1'])
-d2=pd.DataFrame(d2,columns=['d2'])
-df=pd.concat([d1,d2])
-print df
+# 创建一个 dataframe，用日期作为索引
+# States = ['NY', 'NY', 'NY', 'NY', 'FL', 'FL', 'GA', 'GA', 'FL', 'FL']
+# # data = [1.0, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# # idx = pd.date_range('1/1/2012', periods=10, freq='MS')
+# # df1 = pd.DataFrame(data, index=idx, columns=['Revenue'])
+# # df1['State'] = States
+# #
+# # # 创建第二个 dataframe
+# # data2 = [10.0, 10.0, 9, 9, 8, 8, 7, 7, 6, 6]
+# # idx2 = pd.date_range('1/1/2013', periods=10, freq='MS')
+# # df2 = pd.DataFrame(data2, index=idx2, columns=['Revenue'])
+# # df2['State'] = States
+# #
+# # # 把两个 dataframe 合并起来
+# # df = pd.concat([df1,df2])
+# # print df
+
+from sqlalchemy import create_engine
+engine=create_engine('mysql+pymysql://root:zkyr1006@localhost:3306/mydb')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
