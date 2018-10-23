@@ -73,16 +73,63 @@ import pandas as pd
 # # df = pd.concat([df1,df2])
 # # print df
 
-from sqlalchemy import create_engine
-engine=create_engine('mysql+pymysql://root:zkyr1006@localhost:3306/mydb')
+import pymysql
+import sys,os
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+# sql='SELECT NEWSTITLE,NEWSTYPE FROM WEBNEWS'
+# conn=pymysql.connect(host='localhost',
+#                      port=3306,
+#                      user='root',
+#                      passwd='zkyr1006',
+#                      db='news',
+#                      charset='utf8')
+# result=pd.read_sql(sql,conn)
+# conn.close()
+# # 导出为csv格式
+# result.to_csv(r'./news.csv',index=False)
+# # 导出为txt格式
+# result.to_csv(r'./news.txt',index=False)
+# # 导出为Excel
+# result.to_excel(r'./news.xls',index=False,sheet_name='news')
+# # 导出为json
+# result.to_json(r'./news.json')
 
 
 
 
+# data=pd.read_excel('news.xls',sheet_name='news',index_col='NEWSTYPE')
+# print data
+# data=pd.read_json('news.json')
+# print data
 
 
+# df1=pd.DataFrame({'a':[1],'b':['ceshi']})
+# print df1
+# df1.to_excel('test1.xls',index=False)
+# df1.to_excel('test2.xls',index=False)
+# df1.to_excel('test3.xls',index=False)
 
-
+# 定义读取数据的函数
+def get_file(locate):
+    loc=r'./'+locate
+    # print loc
+    df=pd.read_excel(loc,0)
+    df['file']=locate
+    df.set_index('file')
+    return df
+# 存储所有Excel表的名字
+filenames=[]
+# 你存放Excel文件的路径可能不一样，需要修改。
+os.chdir(r"./")
+for files in os.listdir('.'):
+    if files.endswith('.xls'):
+        filenames.append(files)
+# 创建一个 dataframe 的 list
+df_list=[get_file(fname) for fname in filenames]
+# 把 list 中所有的 dataframe 合并成一个
+big_df=pd.concat(df_list)
 
 
 
