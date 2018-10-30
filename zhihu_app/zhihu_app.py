@@ -5,7 +5,7 @@
 # @file : zhihu_app.py
 # @software : PyCharm
 
-import requests,json,pymysql,time
+import requests,pymysql,time
 
 def connect_mysql():
     conn = pymysql.connect(
@@ -19,8 +19,6 @@ def connect_mysql():
     cursor = conn.cursor()
     return conn,cursor
 
-conn,cursor=connect_mysql()
-
 headers = {
     'x-api-version': '3.0.89',
     'x-app-version': '5.26.2',
@@ -33,46 +31,59 @@ headers = {
     'Connection': 'keep-alive'
 }
 
-base_url='https://api.zhihu.com/v4/questions/298905976/answers?order_by=&show_detail=1'
-sql='INSERT INTO zhihu_app(question,text,author,voteup_count,comment_count,update_time)  VALUES(%s,%s,%s,%s,%s,%s)'
-
-for i in range(0,10,5):
-    params = {'offset': i}
-    res = requests.get(base_url, headers=headers, params=params).json()['data']
-    for each in res:
-        update_time=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(each['updated_time']))
-        item=[]
-        cursor.execute(sql, (
-            each['question']['title'],
-            each['excerpt'],
-            each['author']['name'],
-            int(each['voteup_count']),
-            int(each['comment_count']),
-            str(update_time)
-        ))
-    conn.commit()
-
-conn.close()
-cursor.close()
-
-# print items
-
-
-
-# 可以添加一个自定义搜索的功能
-
-
-
 # 从热榜爬取热门问题
 start_url='https://api.zhihu.com/topstory/hot-list?limit=10'
-res=requests.get(start_url).json()['data']
+res=requests.get(start_url,headers=headers).json()['data']
+a=[]
+conn,cursor=connect_mysql()
+sql='INSERT INTO zhihu_app(question,hot,answer_count,text,author,voteup_count,comment_count,update_time)  VALUES(%s,%s,%s,%s,%s,%s,%s,%s)'
+
 for each in res:
-    hot=each['detail_text']
-    title=each['target']['title']
-    excerpt=each['target']['excerpt']
-    answer_count=each['target']['answer_count']
-    comment_count=each['target']['comment_count']
-    guanzhu=each['target']['follower_count']
+    title=each['target']['title_area']['text']
+    hot = each['target']['metrics_area']['text'][:-2]
+    answer_count=each['feed_specific']['answer_count']
+    card_id=list(str(each['target']['link']['url']).split('/'))[-1]
+
+    q_url='https://api.zhihu.com/v4/questions/'+card_id+'/answers?order_by=&show_detail=1'
+
+    # 有些热点是文章，不存在回答
+    try:
+        for i in range(0, 20, 5):
+            params = {'offset': i}
+            res = requests.get(q_url, headers=headers, params=params).json()['data']
+            for item in res:
+                update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(item['updated_time']))
+                cursor.execute(sql, (
+                    title,
+                    hot,
+                    answer_count,
+                    item['excerpt'],
+                    item['author']['name'],
+                    int(item['voteup_count']),
+                    int(item['comment_count']),
+                    str(update_time)
+                ))
+            conn.commit()
+    except:pass
+
+# 去重
+a='delete from zhihu_app where id in (select id from (select id from zhihu_app where id not in (select min(id) from zhihu_app group by text)) as temple)'
+cursor.execute(a)
+conn.commit()
+# # 删除原有主键：
+# b='ALTER TABLE zhihu_app DROP id'
+# cursor.execute(b)
+# conn.commit()
+# # 添加新主键字段：
+# c='ALTER TABLE zhihu_app ADD id MEDIUMINT( 8 ) NOT NULL FIRST'
+# cursor.execute(c)
+# conn.commit()
+# # 设置新主键：
+# d='ALTER TABLE zhihu_app MODIFY COLUMN id MEDIUMINT( 8 ) NOT NULL AUTO_INCREMENT,ADD PRIMARY KEY(id)'
+# cursor.execute(d)
+# conn.commit()
+conn.close()
+cursor.close()
 
 
 
