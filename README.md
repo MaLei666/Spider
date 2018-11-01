@@ -24,5 +24,8 @@
 ## 8. taobao
 爬取淘宝各子标签，按销量排名商品信息，按分类保存至MongoDB，通过数据分析，将商品在各省分布、销量排行、地图分布等通过matplotlib绘图显示
 
+## 9. zhihu_app
+爬取使用ssl-pinning技术的app，fiddler抓包获取api请求，模拟手机端请求数据，解析json存入mysql
+
 ## scrapyd 	
 docker scrapyd 配置文件 	
