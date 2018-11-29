@@ -5,26 +5,27 @@
 # @File           : dianping.py
 # @Product        : PyCharm
 
-import scrapy,numpy
+import scrapy
 from scrapy import Selector
 from dianping.items import DianpingItem
 from scrapy.spiders import CrawlSpider, Rule
-from bs4 import BeautifulSoup
 import requests,re
 from scrapy_splash import SplashRequest
 from urllib.parse import urlencode
+from lxml import etree
 
 class comicspider(scrapy.Spider):
     name = 'dp'
     allowed_domains=['dianping.com']
-    start_urls=['http://www.dianping.com/shoplist/shopRank/pcChannelRankingV2?rankId=90dcc5b1cceea1afd8fd4f1a8cc5603571862f838d1255ea693b953b1d49c7c0']
+    start_urls=['http://www.dianping.com/beijing/food']
 
     headers = {
         'Connection': 'keep-alive',
         'Host': 'www.dianping.com',
         'Accept-Encoding':'gzip, deflate',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0',
+        'Upgrade-Insecure-Requests':'1'
     }
 
     def start_requests(self):
@@ -32,53 +33,53 @@ class comicspider(scrapy.Spider):
 
     def sub_nav(self, response):
         page=Selector(response)
+        # base_url='http://www.dianping.com'
+        # print(response.text)
+        hot_url=page.xpath('//div[@class="item news_list current"]/a[@class="more"]/@href')[0].extract()
+        sub_urls=[]
+        sub_navs=[]
+        sub_urls.append(hot_url)
+        sub_navs.append('热门')
+        res = etree.HTML(requests.get('http://www.dianping.com'+hot_url,headers=self.headers).text)
+        # print(res.text)
         # 分类最佳
-        sub_navs1=page.xpath('//div[@class="box shopRankNav"]/p[1]//a[position()<3]/text()').extract()
-        sub_navs2=page.xpath('//div[@class="box shopRankNav"]/p[2]//a/text()').extract()
-        sub_navs=sub_navs1+sub_navs2
+        sub_navs1=res.xpath('//div[@class="box shopRankNav"]/p[1]//a/text()')
+        sub_navs2=res.xpath('//div[@class="box shopRankNav"]/p[2]//a/text()')
+        sub_navs+=(sub_navs1+sub_navs2)
         print(sub_navs)
-        sub_urls1=page.xpath('//div[@class="box shopRankNav"]/p[1]//a[position()<3]/@href').extract()
-        sub_urls2=page.xpath('//div[@class="box shopRankNav"]/p[2]//a/@href').extract()
-        sub_urls=sub_urls1+sub_urls2
-        print(sub_urls)
+        sub_rankid1=res.xpath('//div[@class="box shopRankNav"]/p[1]//a/@href')
+        sub_rankid2=res.xpath('//div[@class="box shopRankNav"]/p[2]//a/@href')
+        sub_urls+=(sub_rankid1+sub_rankid2)
+        # print(sub_urls)
         for sub_url in sub_urls:
-            yield scrapy.Request(url=sub_url,callback=self.parse0,headers=self.headers,dont_filter=True)
+            # sub_url=base_url+sub_url
+            print(sub_url)
+            # yield scrapy.Request(url=sub_url,callback=self.parse0,headers=self.headers,dont_filter=True)
+            yield SplashRequest(url=sub_url, callback=self.parse0, args={'wait': 0.5}, splash_headers=self.headers, dont_filter=True)
 
-    # def parse0(self, response):
-    #     headers2 = {
-    #         'Connection': 'keep-alive',
-    #         'Host': 's.taobao.com',
-    #         'Accept-Encoding': 'gzip, deflate, br',
-    #         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    #         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
-    #     }
-    #     page=Selector(response)
-    #     # 连衣裙、毛衫/内搭、秋外套……
-    #     sub_navs11=page.xpath('//dl[@class="theme-bd-level2"]/dt/div/a/text()').extract()
-    #     del sub_navs11[-1]
-    #     sub_urls11=page.xpath('//dl[@class="theme-bd-level2"]/dt/div/a/@href').extract()
-    #     del sub_urls11[-1]
-    #     for i in range(0,len(sub_urls11)):
-    #         page_urls=[]
-    #         page_urls.append(sub_urls11[i]+'&sort=sale-desc')
-    #         s=0
-    #         sub_nav=sub_navs11[i]
-    #         for j in range(1,20):
-    #         # for j in range(0, 1):
-    #             senddata = {
-    #                 'sort':'sale-desc',
-    #                 'bcoffset': '0',
-    #                 's': s
-    #             }
-    #             page_url=sub_urls11[i]+'&'+ urlencode(senddata)
-    #             page_urls.append(page_url)
-    #             s+=60
-    #         # print(page_urls)
-    #
-    #         for page_url in page_urls:
-    #             yield SplashRequest(page_url,self.parse1,args={'wait':0.5},splash_headers=headers2,dont_filter=True,meta={'sub_nav':sub_nav})
-    #             # yield scrapy.Request(page_url,callback=self.parse1,headers=headers2,dont_filter=True,meta={'sub_nav':sub_nav})
-    #
+    def parse0(self, response):
+        page=Selector(response)
+        print(response.text)
+        ranks=page.xpath('//section[@class="ranklist-table"]/table/tbody//tr/td[@class="td-rank"]/div/text()')
+        shopNames=page.xpath('//section[@class="ranklist-table"]/table/tbody//tr[position()>1]/td[@class="td-shopName"]/a/span/text()')
+        mainRegions=page.xpath('//section[@class="ranklist-table"]/table/tbody//tr[position()>1]/td[@class="td-mainRegionName"]/div/text()')
+        taste=page.xpath('//section[@class="ranklist-table"]/table/tbody//tr[position()>1]/td[@class="td-refinedScore1"]/div/text()')
+        environment=page.xpath('//section[@class="ranklist-table"]/table/tbody//tr[position()>1]/td[@class="td-refinedScore2"]/div/text()')
+        service=page.xpath('//section[@class="ranklist-table"]/table/tbody//tr[position()>1]/td[@class="td-refinedScore3"]/div/text()')
+        avgPrice=page.xpath('//section[@class="ranklist-table"]/table/tbody//tr[position()>1]/td[@class="td-avgPrice"]/div/text()')
+        print(ranks,shopNames,mainRegions,taste,environment,service,avgPrice)
+
+
+
+
+
+
+
+
+
+
+
+
     # def parse1(self, response):
     #     headers3 = {
     #         'Connection': 'keep-alive',
