@@ -23,10 +23,10 @@ class ProxyMiddleware(object):
     def proxy_test(self):
         # ....
         def get_proxy():
-            return requests.get("http://111.207.68.150:8001/get/").text
+            return requests.get("http://192.168.1.137:8001/get/").text
 
         def delete_proxy(proxy):
-            requests.get("http://111.207.68.150:8001/delete/?proxy={}".format(proxy))
+            requests.get("http://192.168.1.137:8001/delete/?proxy={}".format(proxy))
 
         proxy = "http://{}".format(get_proxy())
         try:

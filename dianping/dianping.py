@@ -150,12 +150,18 @@ try:
     change_frame=browser.find_element_by_class_name('tab tab-account ')
     change_frame.click()
     phone=browser.find_element_by_id('account-textbox')
-    phone.send_keys('账号')
+    phone.send_keys('')
     pw=browser.find_element_by_id('password-textbox')
-    phone.send_keys('密码')
+    phone.send_keys('')
     login_button=browser.find_element_by_id('login-button-account')
     login_button.click()
-    a=browser.get_cookies()
+    try:
+        captcha_test=browser.find_element_by_id('captcha-account-container')
+        img=browser.find_element_by_class_name('captcha')
+
+
+    except:
+        pass
     print(a)
 finally:
     browser.close()

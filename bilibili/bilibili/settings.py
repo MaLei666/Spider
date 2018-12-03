@@ -102,4 +102,4 @@ REDIRECT_ENABLED = False
 SPLASH_URL='http://localhost:8050'
 
 # SCHEDULER = "scrapy_redis.scheduler.Scheduler"
-# REDIS_URL = 'redis://:zkyr1006@111.207.68.150:6379'
+# REDIS_URL = 'redis://:zkyr1006@192.168.1.137:6379'
