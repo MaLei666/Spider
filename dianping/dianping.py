@@ -125,6 +125,8 @@ headers = {
 
 
 from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from time import sleep
 # print(proxie)
 # cursor,conn=connect_mysql()
 # search_url='http://www.dianping.com/shop/'
@@ -140,38 +142,79 @@ from selenium import webdriver
 #     search_url=search_url+shop_id
 #     data=requests.get(search_url,headers,proxies={"http": "http://{}".format(get_proxy())}).status_code
 #     print(data)
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 # binary = FirefoxBinary('/etc/apport/blacklist.d/firefox')
-browser=webdriver.Firefox()
-try:
-    browser.get('http://account.dianping.com/login')
-    login=browser.find_element_by_class_name('bottom-password-login')
-    login.click()
-    change_frame=browser.find_element_by_class_name('tab tab-account ')
-    change_frame.click()
-    phone=browser.find_element_by_id('account-textbox')
-    phone.send_keys('')
-    pw=browser.find_element_by_id('password-textbox')
-    phone.send_keys('')
-    login_button=browser.find_element_by_id('login-button-account')
-    login_button.click()
-    try:
-        captcha_test=browser.find_element_by_id('captcha-account-container')
-        img=browser.find_element_by_class_name('captcha')
+# 设置代理
+service_args = [
+    # '--proxy=%s' %get_proxy(), # 代理 IP：prot    （eg：192.168.0.28:808）
+    '--ssl-protocol=any', #忽略ssl协议
+    '--load - images = no', # 关闭图片加载（可选）
+    '--disk-cache=yes', # 开启缓存（可选）
+    '--ignore-ssl-errors=true' ]# 忽略https错误(可选)
 
+# user_Agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
+# dcap = dict(DesiredCapabilities.PHANTOMJS)
+# dcap["phantomjs.page.settings.userAgent"] = user_Agent
+# browser=webdriver.PhantomJS(desired_capabilities=dcap,service_args=service_args)
 
-    except:
-        pass
-    print(a)
-finally:
-    browser.close()
-
+options = webdriver.FirefoxOptions()
+# options.add_argument('--headless')
+browser=webdriver.Firefox(options=options)
+# try:
+#     browser.get('http://account.dianping.com/login')
+#     # 跳转到登录的iframe，不然获取不到元素
+#     login_frame = browser.find_element_by_xpath('.//div[@id="J_login_container"]/div/iframe')
+#     browser.switch_to_frame(login_frame)
+#     sleep(4)
+#     browser.find_element_by_class_name('bottom-password-login').click()
+#     sleep(2)
+#     # browser.switch_to_frame(login_frame)
+#     browser.find_element_by_id('tab-account').click()
+#     sleep(2)
+#     phone=browser.find_element_by_id('account-textbox')
+#     phone.send_keys('18401570769')
+#     pw=browser.find_element_by_id('password-textbox')
+#     pw.send_keys('conglingkaishi0')
+#     browser.find_element_by_id('login-button-account').click()
+#     sleep(5)
+#     try:
+#         captcha_test=browser.find_element_by_id('captcha-account-container')
+#         img=browser.find_element_by_class_name('captcha')
+#         print('需要验证码')
+#
+#     except:
+#         pass
+#     cookie_items=browser.get_cookies()
+#     post={}
+#     for cookie in cookie_items:
+#         post[cookie['name']]=cookie['value']
+#     print(post)
+#
+# finally:
+#     # browser.close()
+#     pass
+#     browser.close()
 
 
 # cursor.close()
 # conn.close()
+cookies={'lgtoken': '0d5bd5350-a194-4b50-8219-93ca76900779',
+         'dper': '3b07bb25d232ef657f838755d674ec0777aff6b188819326beed1a742d99713553b37593d78db18f441446937b45c5b55599fd87435c7d60f8946c98ea124168',
+         'll': '7fd06e815b796be3df069dec7836c3df',
+         'ua': '18401570769',
+         'ctu': '32a871c547f64c71bccbced43bc3180523918f0c4eb38f9391b358c90aa88b35',
+         'cy': '2',
+         'cye': 'beijing',
+         '_lxsdk_cuid': '1677e9bea08c8-0c6b569bbaafa68-4c312979-100200-1677e9bea095f',
+         '_lxsdk': '1677e9bea08c8-0c6b569bbaafa68-4c312979-100200-1677e9bea095f',
+         '_hc.v': 'd32a23ba-d92b-2376-076d-8ed45010328a.1544017407',
+         '_lxsdk_s': '1677e9bea0a-4fc-c01-ba2%7C%7C7'}
+browser.get('http://www.dianping.com/')
+# dper控制保持登录
+browser.add_cookie(
+    {'name' : 'dper',
+     'value' : '3b07bb25d232ef657f838755d674ec0777aff6b188819326beed1a742d99713553b37593d78db18f441446937b45c5b55599fd87435c7d60f8946c98ea124168'})
 
 
-
+browser.get('http://www.dianping.com/')
 
 
