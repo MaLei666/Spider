@@ -7,7 +7,6 @@
 
 import requests,re
 from datetime import datetime as dt
-from lxml import etree
 from dianping import *
 
 

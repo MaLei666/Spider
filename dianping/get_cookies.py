@@ -21,9 +21,9 @@ try:
     browser.find_element_by_id('tab-account').click()
     sleep(2)
     phone=browser.find_element_by_id('account-textbox')
-    phone.send_keys('')
+    phone.send_keys(conf.get('account','phone'))
     pw=browser.find_element_by_id('password-textbox')
-    pw.send_keys('')
+    pw.send_keys(conf.get('account','pw'))
     sleep(2)
     browser.find_element_by_id('login-button-account').click()
     try:
@@ -33,27 +33,17 @@ try:
 
     except:
         cookie_items=browser.get_cookies()
+
         cookie_Data={}
         for cookie in cookie_items:
             cookie_Data[cookie['name']]=cookie['value']
         print(cookie_items)
-        file=open('cookie.txt','w',encoding='utf-8')
-        file.write(cookie_Data[0]['value'])
-        file.close()
+        # file=open('cookie.txt','w',encoding='utf-8')
+        # file.write(cookie_items[0]['value'])
+        # file.close()
     sleep(5)
 
 finally:
     pass
     # browser.close()
 
-
-
-
-
-# a={'domain': '.dianping.com',
-#    'expiry': 1544078890.305766,
-#    'httpOnly': False,
-#    'name': 'lgtoken',
-#    'path': '/',
-#    'secure': False,
-#    'value': '032f58fcf-f61e-4252-b0f1-e177e5b63d3b'}

@@ -1,9 +1,13 @@
 
 
-__all__=['connect_mysql','headers','get_proxy','requests','browser_set']
+__all__=['connect_mysql','headers','get_proxy','requests','browser_set','conf','etree','sleep']
 
 import pymysql,requests
 from selenium import webdriver
+from configparser import ConfigParser
+from lxml import etree
+from time import  sleep
+
 
 
 def connect_mysql():
@@ -43,16 +47,16 @@ def get_proxy():
 def browser_set():
     # 设置代理
     service_args = [
-        # '--proxy=%s' %get_proxy(), # 代理 IP：prot    （eg：192.168.0.28:808）
+        '--proxy=%s' %get_proxy(), # 代理 IP：prot    （eg：192.168.0.28:808）
         '--ssl-protocol=any', #忽略ssl协议
         '--load - images = no', # 关闭图片加载（可选）
         '--disk-cache=yes', # 开启缓存（可选）
         '--ignore-ssl-errors=true' ]# 忽略https错误(可选)
 
     # 谷歌
-    options=webdriver.ChromeOptions()
-    # options.add_argument('--headless')
-    browser=webdriver.Chrome(options=options)
+    # options=webdriver.ChromeOptions()
+    # # options.add_argument('--headless')
+    # browser=webdriver.Chrome(options=options)
 
     # PhantomJS
     # user_Agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
@@ -61,8 +65,10 @@ def browser_set():
     # browser=webdriver.PhantomJS(desired_capabilities=dcap,service_args=service_args)
 
     # 火狐
-    # options = webdriver.FirefoxOptions()
-    # options.add_argument('--headless')
-    # browser=webdriver.Firefox(options=options)
+    options = webdriver.FirefoxOptions()
+    options.add_argument('--headless')
+    browser=webdriver.Firefox(options=options,service_args=service_args)
     return browser
 
+conf = ConfigParser()
+conf.read('conf.ini')

@@ -5,28 +5,14 @@
 # @file : get_shopinfo.py
 # @software : PyCharm
 
-
 from datetime import datetime as dt
 from dianping import *
 import requests
 
 
-# cookies={'lgtoken': '0d5bd5350-a194-4b50-8219-93ca76900779',
-#          'dper': '3b07bb25d232ef657f838755d674ec0777aff6b188819326beed1a742d99713553b37593d78db18f441446937b45c5b55599fd87435c7d60f8946c98ea124168',
-#          'll': '7fd06e815b796be3df069dec7836c3df',
-#          'ua': '18401570769',
-#          'ctu': '32a871c547f64c71bccbced43bc3180523918f0c4eb38f9391b358c90aa88b35',
-#          'cy': '2',
-#          'cye': 'beijing',
-#          '_lxsdk_cuid': '1677e9bea08c8-0c6b569bbaafa68-4c312979-100200-1677e9bea095f',
-#          '_lxsdk': '1677e9bea08c8-0c6b569bbaafa68-4c312979-100200-1677e9bea095f',
-#          '_hc.v': 'd32a23ba-d92b-2376-076d-8ed45010328a.1544017407',
-#          '_lxsdk_s': '1677e9bea0a-4fc-c01-ba2%7C%7C7'}
-
 def get_id():
     # 从数据库获取店铺id
     cursor,conn=connect_mysql()
-    search_url='http://www.dianping.com/shop/'
     shopid_sql='SELECT shopId FROM food_rank;'
     cursor.execute(shopid_sql)
     shopid_list=list(cursor.fetchall())
@@ -34,23 +20,51 @@ def get_id():
         shopid_list.append(each[0])
         shopid_list.remove(each)
     shopid_list=set(shopid_list)
-    # print(shopid_list,len(shopid_list))
-    for shop_id in shopid_list:
-        search_url=search_url+shop_id
-        data=requests.get(search_url,headers,proxies={"http": "http://{}".format(get_proxy())}).status_code
-        print(data)
     cursor.close()
     conn.close()
+    return shopid_list
+    # print(shopid_list,len(shopid_list))
 
 
-browser=browser_set()
-browser.get('http://www.dianping.com/')
-# dper控制保持登录
-cookie=open('cookie.txt').read()
 
-print(cookie)
+def get_info():
+    shopid_list=get_id()
+    base_url = 'http://www.dianping.com/shop/'
+    num=1
+    browser = browser_set()
+    # cookie_data = {'name': conf.get('cookies','name'),
+    #                'value':conf.get('cookies','value') }
 
-browser.add_cookie(
-    {'name' : 'value',
-     'value' : cookie})
-browser.get('http://www.dianping.com/')
+    for shop_id in shopid_list:
+        # search_url = base_url + shop_id+'/review_all/p'+str(num)
+        search_url = base_url + shop_id
+        print(search_url)
+        browser.get(search_url)
+
+        # dper控制保持登录
+        # browser.add_cookie(cookies)
+        # browser.get(search_url)
+        try:
+            # splash_url = 'http://192.168.1.137:8050/render.html?url='+search_url
+            # print(splash_url)
+            # data = requests.get(splash_url, cookies=cookie_data,headers=headers)
+            # print(data.text)
+            # response = etree.HTML(data.text)
+            # print(data)
+            good_count = browser.find_element_by_xpath('//label[@class="filter-item filter-good"]/span/text()')
+            middle_count=browser.find_element_by_xpath('//label[@class="filter-item filter-middle"]/span/text()')
+            bad_count=browser.find_element_by_xpath('//label[@class="filter-item filter-bad"]/span/text()')
+            pages=browser.find_element_by_xpath('//div[@class="reviews-pages"]/a[last()-1]/text()')
+            print(good_count,middle_count,bad_count,pages)
+            num+=1
+        except:
+            try:
+                if browser.find_element_by_xpath('//div[@_slider__sliderTitle___119tD]/p') or browser.find_element_by_id('yodaModuleWrapper'):
+                    print('需要验证码')
+                sleep(10)
+            except:
+                print('页面爬取错误')
+        finally:
+            sleep(3)
+
+get_info()
