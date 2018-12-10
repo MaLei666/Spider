@@ -32,18 +32,20 @@ def get_info():
     base_url = 'http://www.dianping.com/shop/'
     num=1
     browser = browser_set()
-    # cookie_data = {'name': conf.get('cookies','name'),
-    #                'value':conf.get('cookies','value') }
+    cookie_data = {'name': conf.get('cookies','name'),
+                   'value':conf.get('cookies','value') }
 
     for shop_id in shopid_list:
         # search_url = base_url + shop_id+'/review_all/p'+str(num)
         search_url = base_url + shop_id
         print(search_url)
         browser.get(search_url)
-
-        # dper控制保持登录
-        # browser.add_cookie(cookies)
+        # sleep(1)
+        # # dper控制保持登录
+        # browser.add_cookie(cookie_data)
         # browser.get(search_url)
+        print(browser.page_source)
+
         try:
             # splash_url = 'http://192.168.1.137:8050/render.html?url='+search_url
             # print(splash_url)

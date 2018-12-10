@@ -48,10 +48,11 @@ def browser_set():
     # 设置代理
     service_args = [
         '--proxy=%s' %get_proxy(), # 代理 IP：prot    （eg：192.168.0.28:808）
-        '--ssl-protocol=any', #忽略ssl协议
-        '--load - images = no', # 关闭图片加载（可选）
-        '--disk-cache=yes', # 开启缓存（可选）
-        '--ignore-ssl-errors=true' ]# 忽略https错误(可选)
+        # '--ssl-protocol=any', #忽略ssl协议
+        # '--load - images = no', # 关闭图片加载（可选）
+        # '--disk-cache=yes', # 开启缓存（可选）
+        # '--ignore-ssl-errors=true' # 忽略https错误(可选)
+    ]
 
     # 谷歌
     # options=webdriver.ChromeOptions()
@@ -67,7 +68,8 @@ def browser_set():
     # 火狐
     options = webdriver.FirefoxOptions()
     options.add_argument('--headless')
-    browser=webdriver.Firefox(options=options,service_args=service_args)
+    options.add_argument('--disable-gpu')
+    browser=webdriver.Firefox(options=options,proxy=get_proxy())
     return browser
 
 conf = ConfigParser()
