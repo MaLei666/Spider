@@ -1,6 +1,6 @@
 
 
-__all__=['connect_mysql','headers','get_proxy','requests','conf','etree','sleep','request_set','clear_text','remove_emoji']
+__all__=['connect_mysql','headers','get_proxy','requests','conf','etree','sleep','request_set','clear_text','remove_emoji','browser_set']
 
 import pymysql,requests,random,re
 from selenium import webdriver
@@ -54,7 +54,7 @@ def clear_text(input):
         re_each = re.sub(' +', '', re_each)
         re_each = re.sub('\t+', '', re_each)
         re_each = re.sub('\xa0', '', re_each)
-        # input.append(remove_emoji(re_each))
+        re_each = remove_emoji(re_each)
         input.append(re_each)
         input.remove(each)
     while '' in input:
@@ -69,7 +69,14 @@ def request_set(req_url):
     res.encoding = 'utf-8'
     res = etree.HTML(res.text)
     return res
-# def browser_set():
+def browser_set():
+    # 火狐
+    options = webdriver.FirefoxOptions()
+    options.add_argument('--headless')
+    options.add_argument('--disable-gpu')
+    browser=webdriver.Firefox(options=options,proxy=get_proxy())
+    return browser
+
     # 设置代理
     # service_args = [
     #     # '--proxy=%s' %get_proxy(), # 代理 IP：prot    （eg：192.168.0.28:808）
@@ -90,12 +97,7 @@ def request_set(req_url):
     # dcap["phantomjs.page.settings.userAgent"] = user_Agent
     # browser=webdriver.PhantomJS(desired_capabilities=dcap,service_args=service_args)
 
-    # 火狐
-    # options = webdriver.FirefoxOptions()
-    # options.add_argument('--headless')
-    # options.add_argument('--disable-gpu')
-    # browser=webdriver.Firefox(options=options,proxy=get_proxy())
-    # return browser
+
 
 conf = ConfigParser()
 conf.read('conf.ini')
