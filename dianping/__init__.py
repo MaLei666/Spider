@@ -1,18 +1,18 @@
 
 
-__all__=['connect_mysql','headers','get_proxy','requests','conf','etree','sleep','request_set','clear_text','remove_emoji','browser_set']
+__all__=['connect_mysql','headers','get_proxy','requests','conf','etree','sleep','request_set','clear_text','remove_emoji']
 
 import pymysql,requests,random,re
 from selenium import webdriver
 from configparser import ConfigParser
 from lxml import etree
-from time import  sleep
+from time import sleep
 from fake_useragent import UserAgent
-ua = UserAgent()
+ua = UserAgent(use_cache_server=False)
 
 headers = {'User-Agent': ua.random,
-           'Cookie': 'dper=3b07bb25d232ef657f838755d674ec07b30d92b1b823317ef4c47b967141ff58c17b488c5e5a8aae933965adc39454897708fb4dff9d13b4f5169935ad936f6a61fa532c42edb595ad32bc854c5952d4612d10e9c59ee868c7da1197e3c2f0a8',
-           'Referer': 'http://www.dianping.com/shop/518986/review_all',
+           'Cookie': 'cy=2; cye=beijing; _lxsdk_cuid=1678143e851c8-00e29431fc68ab-4c312979-100200-1678143e852c8; _lxsdk=1678143e851c8-00e29431fc68ab-4c312979-100200-1678143e852c8; _hc.v=f7dd3b59-ce27-c574-e24c-a7f03125dea8.1544061972; hibext_instdsigdipv2=1; ua=18401570769; ctu=32a871c547f64c71bccbced43bc31805f994a3d6bf22356b5663d600cf014e22; dper=3b07bb25d232ef657f838755d674ec07b30d92b1b823317ef4c47b967141ff58c17b488c5e5a8aae933965adc39454897708fb4dff9d13b4f5169935ad936f6a61fa532c42edb595ad32bc854c5952d4612d10e9c59ee868c7da1197e3c2f0a8; s_ViewType=10; ll=7fd06e815b796be3df069dec7836c3df; _lxsdk_s=167a5fd79a0-ccf-2e3-75c%7C%7C960',
+           'Referer': 'http://www.dianping.com/shop/102474045/review_all',
            'Connection': 'keep-alive',
            'Host': 'www.dianping.com',
            }
@@ -28,8 +28,6 @@ def connect_mysql():
     )
     cursor = conn.cursor()
     return cursor,conn
-
-
 
 '''
 代理启动步骤
@@ -61,21 +59,28 @@ def clear_text(input):
         input.remove('')
     return input
 
+list1=['']
+
 # request请求设置
 def request_set(req_url):
-    sleep(random.random() * 3 + 2)
-    res = requests.get(url=req_url, timeout=5, headers=headers)
-    res.raise_for_status()
-    res.encoding = 'utf-8'
-    res = etree.HTML(res.text)
-    return res
-def browser_set():
-    # 火狐
-    options = webdriver.FirefoxOptions()
-    options.add_argument('--headless')
-    options.add_argument('--disable-gpu')
-    browser=webdriver.Firefox(options=options,proxy=get_proxy())
-    return browser
+    sleep(random.random() * 6 + 2)
+    res=''
+    try:
+        res = requests.get(url=req_url,timeout=10, headers=headers)
+        res.raise_for_status()
+        res.encoding = 'utf-8'
+        # res = etree.HTML(res.text)
+        return res.text
+    except:
+        print(res.status_code)
+
+# def browser_set():
+#     # 火狐
+#     options = webdriver.FirefoxOptions()
+#     options.add_argument('--headless')
+#     # options.add_argument('--disable-gpu')
+#     browser=webdriver.Firefox(options=options)
+#     return browser
 
     # 设置代理
     # service_args = [
