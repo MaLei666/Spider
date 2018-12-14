@@ -11,6 +11,20 @@ from bs4 import  BeautifulSoup
 from datetime import datetime as dt
 
 def get_id():
+    # 续爬功能查询断点处
+    def begin_point(shopid_list, shopname_list):
+        # 查询是哪个商铺的第几页的第几条评论
+        check_db_sql = 'select shopId,now_page,re_no from shop_info order by id DESC limit 1'
+        cursor.execute(check_db_sql)
+        info = cursor.fetchone()
+        try:
+            list_id = shopid_list.index(info[0])
+            shopid_list = shopid_list[list_id:]
+            shopname_list=shopname_list[list_id:]
+            return shopid_list, shopname_list, info[1], info[2]
+        except:
+            return shopid_list, shopname_list, 0, 0
+
     # 从数据库获取店铺id
     cursor,conn=connect_mysql()
     shopid_sql='SELECT shopId,shopName FROM food_rank;'
@@ -21,12 +35,10 @@ def get_id():
         shopid_list.append(each[0])
         shopname_list.append(each[1])
         shopid_list.remove(each)
-    # shopid_list=set(shopid_list)
-    # shopname_list=set(shopname_list)
+    shopid_list,shopname_list,now_page,re_no=begin_point(shopid_list,shopname_list)
     cursor.close()
     conn.close()
-    return shopid_list,shopname_list
-    # print(shopid_list,len(shopid_list))
+    return shopid_list,shopname_list,now_page,re_no
 
 def create_shop_db():
     try:
@@ -52,12 +64,12 @@ def create_shop_db():
 
 def get_shop_info():
     create_shop_db()
-    shopid_list,shopname_list = get_id()
+    shopid_list,shopname_list,now_page,re_no = get_id()
     base_url = 'http://www.dianping.com/shop/'
     for i in range(0,len(shopid_list)):
-
+        begin_page=0
         info_url=base_url+shopid_list[i]+'/review_all'
-        # print(info_url)
+        pages=0
         try:
             res=request_set(info_url)
             res_html = etree.HTML(res)
@@ -65,23 +77,42 @@ def get_shop_info():
             # middle_count = res.xpath('//label[@class="filter-item filter-middle"]/span/text()')[0][1:-1]
             # bad_count = res.xpath('//label[@class="filter-item filter-bad"]/span/text()')[0][1:-1]
             # re_num = res.xpath('//span[@class="active"]/em/text()')[0][1:-1]
-            try:
-                get_rewiew_info(res,1,shopid_list[i],shopname_list[i])
-            except:
-                pass
-
-            pages = int(res_html.xpath('//div[@class="reviews-pages"]/a[last()-1]/text()')[0])
-            tags=res_html.xpath('//div[@class="reviews-tags"]/div[@class="content"]//span/a/text()')
-            tags=clear_text(tags)
+            # tags=res_html.xpath('//div[@class="reviews-tags"]/div[@class="content"]//span/a/text()')
+            # tags=clear_text(tags)
             # print(good_count,middle_count,bad_count,re_num,pages,tags)
-            if pages>=2:
-                for page in range(2,pages+1):
-                    review_url=info_url+'/p'+str(page)
+            try:
+                # 小于1页的没有page元素
+                pages = int(res_html.xpath('//div[@class="reviews-pages"]/a[last()-1]/text()')[0])
+                if now_page==0:  #第一次爬取/断点后新商户爬取
+                    begin_page=2
+                elif now_page!=0:   #有断点的爬取
+                    begin_page=now_page
+                # 爬取第一页
+                try:
+                    get_rewiew_info(res, 1, shopid_list[i], shopname_list[i])
+                except:
+                    break
+                # 爬取第二页或者指定页到尾页
+                for page in range(begin_page, pages + 1):
+                    # 判断为第几条
+                    if re_no
+
+
+                    review_url = info_url + '/p' + str(page)
                     res = request_set(review_url)
-                    get_rewiew_info(res,page,shopid_list[i],shopname_list[i])
-            print('爬取{}店铺成功'.format(shopname_list[i]))
+                    try:
+                        get_rewiew_info(res, page, shopid_list[i], shopname_list[i])
+                    except:
+                        break
+                print('爬取{}店铺成功'.format(shopname_list[i]))
+            except:
+                print('店铺评论小于一页，跳过爬取')
+
+
+
+
         except:
-            print('请求页面失败')
+            break
 
 
 def get_rewiew_info(res,page,shopid,shopname):
@@ -130,19 +161,18 @@ def get_rewiew_info(res,page,shopid,shopname):
             print('页面返回非评论页面')
 
 def insert_review_info(reviews,recommends,review_times,shopid,shopname,page):
-    num=0
     cursor, conn = connect_mysql()
+    update_time=dt.now()
     for i in range(0, len(reviews)):
         try:
             sql = 'INSERT INTO shop_info(shopId,shopName,review,review_recommend,review_time,update_time,now_page,re_no) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)'
-            cursor.execute(sql,(shopid,shopname,reviews[i],recommends[i],review_times[i]),dt.now(),page,num)
+            cursor.execute(sql,(shopid,shopname,reviews[i],recommends[i],review_times[i],update_time,str(page),str(i)))
             conn.commit()
         except:
             print('信息入库失败')
             conn.rollback()
     cursor.close()
     conn.close()
-    return num
 
 def check_db_info():
     cursor, conn = connect_mysql()
@@ -151,7 +181,4 @@ def check_db_info():
     cursor.execute(a)
     conn.commit()
 
-# def xuchuan():
-
-
-get_shop_info()
+# get_shop_info()
