@@ -1,17 +1,17 @@
 
 
-__all__=['connect_mysql','headers','get_proxy','requests','conf','etree','sleep','request_set','clear_text','remove_emoji']
+__all__=['connect_mysql','browser_set','headers','get_proxy','requests','conf','etree','sleep','request_set','clear_text','remove_emoji']
 
 import pymysql,requests,random,re
 from selenium import webdriver
 from configparser import ConfigParser
 from lxml import etree
 from time import sleep
-from fake_useragent import UserAgent
-ua = UserAgent(use_cache_server=False)
+# from fake_useragent import UserAgent
+# ua = UserAgent(use_cache_server=False,verify_ssl=False)
 
-headers = {'User-Agent': ua.random,
-           'Cookie': 'dper=3b07bb25d232ef657f838755d674ec07b30d92b1b823317ef4c47b967141ff58c17b488c5e5a8aae933965adc39454897708fb4dff9d13b4f5169935ad936f6a61fa532c42edb595ad32bc854c5952d4612d10e9c59ee868c7da1197e3c2f0a8',
+headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+           'Cookie': 'dper=3b07bb25d232ef657f838755d674ec077d670ea2f0af420d657c27bdcc3ee0ddb978d5b8cbe918b29f492f939e933caf187d52888b9998d5f5f7e582b55d121f41f0346e2292fb322ff6f8407714921228578da028494ee16c6177b6fc39a71b',
            'Referer': 'http://www.dianping.com/shop/102474045/review_all',
            'Connection': 'keep-alive',
            'Host': 'www.dianping.com',
@@ -72,13 +72,13 @@ def request_set(req_url):
     except:
         print('请求网页失败')
 
-# def browser_set():
-#     # 火狐
-#     options = webdriver.FirefoxOptions()
-#     options.add_argument('--headless')
-#     # options.add_argument('--disable-gpu')
-#     browser=webdriver.Firefox(options=options)
-#     return browser
+def browser_set():
+    # 火狐
+    options = webdriver.FirefoxOptions()
+    options.add_argument('--headless')
+    # options.add_argument('--disable-gpu')
+    browser=webdriver.Firefox(options=options)
+    return browser
 
     # 设置代理
     # service_args = [

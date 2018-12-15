@@ -16,7 +16,7 @@ def create_db():
           'class VARCHAR(100) NOT NULL,' \
           'classifi VARCHAR(100) NULL,' \
           'class_id INT(100) NULL,' \
-          'rank INT(100) NULL,' \
+          'rank_num INT(100) NULL,' \
           'shopId VARCHAR(100) NOT NULL,' \
           'shopName VARCHAR(100) NOT NULL,' \
           'mainRegionName VARCHAR(100) NULL,' \
@@ -59,7 +59,7 @@ def insert_db(classifi,class_name):
                 service = each['refinedScore3']
                 avgPrice = each['avgPrice']
                 address = each['address']
-                sql = 'INSERT INTO food_rank(class,class_id,classifi,rank,shopId,shopName,mainRegionName,taste,environment,service,avgPrice,city_id,address,update_time) ' \
+                sql = 'INSERT INTO food_rank(class,class_id,classifi,rank_num,shopId,shopName,mainRegionName,taste,environment,service,avgPrice,city_id,address,update_time) ' \
                       'VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
                 cursor.execute(sql, (class_name[i],
                                      i,
@@ -77,10 +77,11 @@ def insert_db(classifi,class_name):
                                      update_time))
                 conn.commit()
                 num += 1
+            print('爬取{}排行榜成功'.format(class_name[i]))
         except:
-            pass
+            print('获取商铺信息出错')
     # 去重
-    a = 'delete from food_rank where id in (select id from (select id from food_rank where id not in (select min(id) from food_rank group by class,shopName,rank)) as temple)'
+    a = 'delete from food_rank where id in (select id from (select id from food_rank where id not in (select min(id) from food_rank group by class,shopName,rank_num)) as temple)'
     cursor.execute(a)
     conn.commit()
     cursor.close()
@@ -90,26 +91,29 @@ def get_rank_info():
     create_db()
     base_url = 'http://www.dianping.com'
     start_url = 'http://www.dianping.com/beijing/food'
-    res = requests.get(start_url, headers=headers).text
-    response = etree.HTML(res)
-    hot_url = response.xpath('//div[@class="item news_list current"]/a[@class="more"]/@href')
-    # print(hot_url)
-    classifi_res = requests.get((base_url + hot_url[0]), headers).text
-    response = etree.HTML(classifi_res)
-    # 第一行标签
-    classifi1 = hot_url + response.xpath('//div[@class="box shopRankNav"]/p[1]//a/@href')
-    class_name1 = ['热门'] + response.xpath('//div[@class="box shopRankNav"]/p[1]//a/text()')
-    # 第二行标签
-    classifi2 = response.xpath('//div[@class="box shopRankNav"]/p[2]//a/@href')
-    class_name2 = response.xpath('//div[@class="box shopRankNav"]/p[2]//a/text()')
-    # 所有标签和名称
-    class_name = class_name1 + class_name2
-    classifi = classifi1 + classifi2
-    ajax_base_url = 'http://www.dianping.com/mylist/ajax/shoprank?rankId='
-    for each in classifi[:]:
-        classifi.append(ajax_base_url + each.split('=')[1])
-        classifi.remove(each)
-    insert_db(classifi,class_name)
+    try:
+        res = requests.get(start_url, headers=headers).text
+        response = etree.HTML(res)
+        hot_url = response.xpath('//div[@class="item news_list current"]/a[@class="more"]/@href')
+        # print(hot_url)
+        classifi_res = requests.get((base_url + hot_url[0]), headers).text
+        response = etree.HTML(classifi_res)
+        # 第一行标签
+        classifi1 = hot_url + response.xpath('//div[@class="box shopRankNav"]/p[1]//a/@href')
+        class_name1 = ['热门'] + response.xpath('//div[@class="box shopRankNav"]/p[1]//a/text()')
+        # 第二行标签
+        classifi2 = response.xpath('//div[@class="box shopRankNav"]/p[2]//a/@href')
+        class_name2 = response.xpath('//div[@class="box shopRankNav"]/p[2]//a/text()')
+        # 所有标签和名称
+        class_name = class_name1 + class_name2
+        classifi = classifi1 + classifi2
+        ajax_base_url = 'http://www.dianping.com/mylist/ajax/shoprank?rankId='
+        for each in classifi[:]:
+            classifi.append(ajax_base_url + each.split('=')[1])
+            classifi.remove(each)
+        insert_db(classifi,class_name)
+    except:
+        print('爬取榜单出错')
 
 get_rank_info()
 

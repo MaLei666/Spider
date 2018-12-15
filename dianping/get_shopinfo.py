@@ -1,6 +1,6 @@
 #!/home/zkfr/.local/share/virtualenvs/xf-5EfV3Nly/bin/python
 #-*- coding:utf-8 -*-
-# @author : MaLei 
+# @author : MaLei
 # @datetime : 2018-12-06 13:54
 # @file : get_shopinfo.py
 # @software : PyCharm
@@ -17,11 +17,19 @@ def get_id():
         check_db_sql = 'select shopId,now_page,re_no from shop_info order by id DESC limit 1'
         cursor.execute(check_db_sql)
         info = cursor.fetchone()
+        page=info[1]
+        re_no=info[2]
         try:
             list_id = shopid_list.index(info[0])
             shopid_list = shopid_list[list_id:]
             shopname_list=shopname_list[list_id:]
-            return shopid_list, shopname_list, info[1], info[2]
+            if info[2]==19:
+                page+=1
+                re_no=0
+            else:
+                re_no+=1
+            print('断点开始处为：{}-第{}页-第{}条评论'.format(shopname_list[0],page,re_no+1))
+            return shopid_list, shopname_list, page, re_no
         except:
             return shopid_list, shopname_list, 0, 0
 
@@ -62,66 +70,19 @@ def create_shop_db():
     except:
         print('创建失败')
 
-def get_shop_info():
-    create_shop_db()
-    shopid_list,shopname_list,now_page,re_no = get_id()
-    base_url = 'http://www.dianping.com/shop/'
-    for i in range(0,len(shopid_list)):
-        begin_page=0
-        info_url=base_url+shopid_list[i]+'/review_all'
-        pages=0
-        try:
-            res=request_set(info_url)
-            res_html = etree.HTML(res)
-            # good_count = res.xpath('//label[@class="filter-item filter-good"]/span/text()')[0][1:-1]
-            # middle_count = res.xpath('//label[@class="filter-item filter-middle"]/span/text()')[0][1:-1]
-            # bad_count = res.xpath('//label[@class="filter-item filter-bad"]/span/text()')[0][1:-1]
-            # re_num = res.xpath('//span[@class="active"]/em/text()')[0][1:-1]
-            # tags=res_html.xpath('//div[@class="reviews-tags"]/div[@class="content"]//span/a/text()')
-            # tags=clear_text(tags)
-            # print(good_count,middle_count,bad_count,re_num,pages,tags)
-            try:
-                # 小于1页的没有page元素
-                pages = int(res_html.xpath('//div[@class="reviews-pages"]/a[last()-1]/text()')[0])
-                if now_page==0:  #第一次爬取/断点后新商户爬取
-                    begin_page=2
-                elif now_page!=0:   #有断点的爬取
-                    begin_page=now_page
-                # 爬取第一页
-                try:
-                    get_rewiew_info(res, 1, shopid_list[i], shopname_list[i])
-                except:
-                    break
-                # 爬取第二页或者指定页到尾页
-                for page in range(begin_page, pages + 1):
-                    # 判断为第几条
-                    if re_no
-
-
-                    review_url = info_url + '/p' + str(page)
-                    res = request_set(review_url)
-                    try:
-                        get_rewiew_info(res, page, shopid_list[i], shopname_list[i])
-                    except:
-                        break
-                print('爬取{}店铺成功'.format(shopname_list[i]))
-            except:
-                print('店铺评论小于一页，跳过爬取')
-
-
-
-
-        except:
-            break
-
-
-def get_rewiew_info(res,page,shopid,shopname):
+def get_rewiew_info(res,page,re_no,shopid,shopname):
     soup = BeautifulSoup(res, 'lxml')
     reviews = []
     recommends=[]
     review_times=[]
+    # 设置评论开始点，默认从第1条，存在断点第话取断点值
+    begin_point=0
+    if re_no!=0:
+        begin_point=re_no+1
     try:
+        # 查找所有评论的标签
         soup=soup.find(class_='reviews-items').ul.find_all('li',recursive=False)
+        soup=soup[begin_point:]
         for i in soup:
             i=BeautifulSoup(str(i),'lxml')
             try:
@@ -148,7 +109,6 @@ def get_rewiew_info(res,page,shopid,shopname):
         # print(reviews,recommends,review_times)
         insert_review_info(reviews,recommends,review_times,shopid,shopname,page)
         print('爬取{}第{}页成功'.format(shopname,page))
-
     except:
         # 后期添加tenserflow识别验证码
         # print(soup)
@@ -165,8 +125,10 @@ def insert_review_info(reviews,recommends,review_times,shopid,shopname,page):
     update_time=dt.now()
     for i in range(0, len(reviews)):
         try:
-            sql = 'INSERT INTO shop_info(shopId,shopName,review,review_recommend,review_time,update_time,now_page,re_no) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)'
-            cursor.execute(sql,(shopid,shopname,reviews[i],recommends[i],review_times[i],update_time,str(page),str(i)))
+            sql = 'INSERT INTO shop_info(shopId,shopName,review,review_recommend,review_time,update_time,' \
+                  'now_page,re_no) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)'
+            cursor.execute(sql,(shopid,shopname,reviews[i],recommends[i],review_times[i],update_time,
+                                str(page),str(i)))
             conn.commit()
         except:
             print('信息入库失败')
@@ -174,11 +136,61 @@ def insert_review_info(reviews,recommends,review_times,shopid,shopname,page):
     cursor.close()
     conn.close()
 
-def check_db_info():
-    cursor, conn = connect_mysql()
-    # 去重
-    a = 'delete from shop_info where id in (select id from (select id from shop_info where id not in (select min(id) from shop_info group by review)) as temple)'
-    cursor.execute(a)
-    conn.commit()
+def get_shop_info():
+    create_shop_db()
+    # 获取店铺信息，和断点信息
+    shopid_list,shopname_list,now_page,re_no = get_id()
+    base_url = 'http://www.dianping.com/shop/'
+    # 遍历店铺
+    for i in range(0,len(shopid_list)):
+        # 开始爬取页码默认设置为1
+        begin_page=1
+        info_url=base_url+shopid_list[i]+'/review_all'
+        try:
+            res=request_set(info_url)
+            res_html = etree.HTML(res)
+            # good_count = res.xpath('//label[@class="filter-item filter-good"]/span/text()')[0][1:-1]
+            # middle_count = res.xpath('//label[@class="filter-item filter-middle"]/span/text()')[0][1:-1]
+            # bad_count = res.xpath('//label[@class="filter-item filter-bad"]/span/text()')[0][1:-1]
+            # re_num = res.xpath('//span[@class="active"]/em/text()')[0][1:-1]
+            # tags=res_html.xpath('//div[@class="reviews-tags"]/div[@class="content"]//span/a/text()')
+            # tags=clear_text(tags)
+            # print(good_count,middle_count,bad_count,re_num,pages,tags)
+            try:
+                # 小于1页的没有page元素，默认不爬取
+                pages = int(res_html.xpath('//div[@class="reviews-pages"]/a[last()-1]/text()')[0])
+                # 如果返回的当前页码为0，即从未爬取过，或者为每次的新商户爬取。设置开始页码为2
+                if now_page==0:
+                    begin_page=2
+                    # 爬取第一页
+                    try:
+                        get_rewiew_info(res, 1, 0, shopid_list[i], shopname_list[i])
+                    except:
+                        break
+                # 如果返回的当前页码不为0，即存在断点，从断点处续爬
+                elif now_page!=0:
+                    begin_page=now_page
 
-# get_shop_info()
+                # 爬取第二页或者指定页到尾页
+                while begin_page<=pages:
+                    for page in range(begin_page, pages + 1):
+                        review_url = info_url + '/p' + str(page)
+                        res = request_set(review_url)
+                        try:
+                            get_rewiew_info(res, page, re_no,shopid_list[i], shopname_list[i])
+                        except:
+                            break
+                    print('爬取{}店铺成功'.format(shopname_list[i]))
+                    now_page=0
+                    re_no=0
+            except:
+                print('店铺评论小于一页，跳过爬取')
+        except:
+            break
+    while SystemExit or KeyboardInterrupt:
+        break
+
+
+
+
+get_shop_info()
