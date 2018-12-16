@@ -17,12 +17,12 @@ def get_id():
         check_db_sql = 'select shopId,now_page,re_no from shop_info order by id DESC limit 1'
         cursor.execute(check_db_sql)
         info = cursor.fetchone()
-        page=info[1]
-        re_no=info[2]
         try:
             list_id = shopid_list.index(info[0])
             shopid_list = shopid_list[list_id:]
             shopname_list=shopname_list[list_id:]
+            page = info[1]
+            re_no = info[2]
             if info[2]==19:
                 page+=1
                 re_no=0
@@ -113,6 +113,7 @@ def get_rewiew_info(res,page,re_no,shopid,shopname):
         # 后期添加tenserflow识别验证码
         # print(soup)
         if soup.find_all(class_='_slider__sliderTitle___119tD') or soup.find_all(id='not-found-tip') :
+            # print(soup)
             print('需要验证\n')
             if input() ==1:
                 pass
@@ -175,6 +176,7 @@ def get_shop_info():
                 while begin_page<=pages:
                     for page in range(begin_page, pages + 1):
                         review_url = info_url + '/p' + str(page)
+                        print(review_url)
                         res = request_set(review_url)
                         try:
                             get_rewiew_info(res, page, re_no,shopid_list[i], shopname_list[i])
@@ -191,6 +193,9 @@ def get_shop_info():
         break
 
 
+try:
+    while True:
+        get_shop_info()
+except (KeyboardInterrupt, SystemExit):
+    print('爬取结束')
 
-
-get_shop_info()
