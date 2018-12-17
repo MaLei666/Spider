@@ -11,7 +11,7 @@ from time import sleep
 # ua = UserAgent(use_cache_server=False,verify_ssl=False)
 
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
-           'Cookie': 'dper=3b07bb25d232ef657f838755d674ec076b9f95363761318de6654a51b3b3311a57ab89eecea1ff5093c419b893009cdf54684b0fffc77f42d2f1595f49d1a6508ecb9e9bb3d4b0bd760b0b27e65053058de562abcba4181cc67e4f6f44c5a67b',
+           'Cookie': 'dper=3b07bb25d232ef657f838755d674ec07b30d92b1b823317ef4c47b967141ff58c17b488c5e5a8aae933965adc39454897708fb4dff9d13b4f5169935ad936f6a61fa532c42edb595ad32bc854c5952d4612d10e9c59ee868c7da1197e3c2f0a8',
            'Referer': 'http://www.dianping.com/shop/102474045/review_all',
            'Connection': 'keep-alive',
            'Host': 'www.dianping.com',
