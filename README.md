@@ -1,7 +1,7 @@
 # Spider爬虫实例
 
-## 1. Ajax_weibo 	
-输入要爬取的博主ID，获取ajax请求，解析json数据，爬取博主所有微博，保存至MySQL 	
+## 1. dianping
+大众点评获取所有排行榜店铺信息建表入库，selenium登录获取cookie，使用cookie模拟登录，从库中获取所有店铺的id，拼接URL获取每个店铺所有评论信息并建表入库，添加断点续爬功能，程序中断后自动从断点开始爬取。
 
 ## 2. zhihuCrawl 	
 知乎模拟登录，验证码图片保存，输入识别的验证码，获取当日热门话题及其高赞回答，保存问题标题、链接，回答者的ID，内容及点赞数量，存储至MongoDB
@@ -26,6 +26,9 @@
 
 ## 9. zhihu_app
 爬取使用ssl-pinning技术的app，fiddler抓包获取api请求，模拟手机端请求数据，解析json存入mysql
+
+## 10. Ajax_weibo 	
+输入要爬取的博主ID，获取ajax请求，解析json数据，爬取博主所有微博，保存至MySQL 	
 
 ## scrapyd 	
 docker scrapyd 配置文件 	
