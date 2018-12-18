@@ -26,17 +26,13 @@ try:
     pw.send_keys(conf.get('account','pw'))
     sleep(2)
     browser.find_element_by_id('login-button-account').click()
+    sleep(3)
 
     try:
-        cookie_items=browser.get_cookies()
-        print(cookie_items)
-        cookie_Data={}
-        for cookie in cookie_items:
-            cookie_Data[cookie['name']]=cookie['value']
-        print(cookie_items)
-        file=open('cookie.txt','w',encoding='utf-8')
-        file.write(cookie_items[0]['value'])
-        file.close()
+        cookie_items=browser.get_cookie(name='dper')
+        conf.set('cookies', 'value', cookie_items['value'])
+        with open('conf.ini', 'w') as wr:
+            conf.write(wr)
 
     except:
         captcha_test=browser.find_element_by_id('captcha-account-container')
@@ -47,6 +43,5 @@ try:
     sleep(5)
 
 finally:
-    pass
-    # browser.close()
+    browser.close()
 
