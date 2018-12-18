@@ -5,7 +5,6 @@
 # @file : dianping.py
 # @software : PyCharm
 
-import requests,re
 from datetime import datetime as dt
 from dianping import *
 
