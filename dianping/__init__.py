@@ -14,7 +14,7 @@ conf = ConfigParser()
 conf.read('conf.ini')
 
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
-           'Cookie': '{}={}'.format(conf.get('cookies','name'),conf.get('cookies','value')),
+           # 'Cookie': '{}={}'.format(conf.get('cookies','name'),conf.get('cookies','value')),
            'Referer': 'http://www.dianping.com/shop/102474045/review_all',
            'Connection': 'keep-alive',
            'Host': 'www.dianping.com',
