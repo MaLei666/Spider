@@ -12,9 +12,9 @@ def create_db():
     cursor, conn = connect_mysql()
     sql = 'CREATE TABLE IF NOT EXISTS food_rank(' \
           'id INT UNSIGNED AUTO_INCREMENT,' \
-          'class VARCHAR(100) NOT NULL,' \
+          'tip VARCHAR(100) NOT NULL,' \
+          'tip_id INT(100) NULL,' \
           'classifi VARCHAR(100) NULL,' \
-          'class_id INT(100) NULL,' \
           'rank_num INT(100) NULL,' \
           'shopId VARCHAR(100) NOT NULL,' \
           'shopName VARCHAR(100) NOT NULL,' \
@@ -58,7 +58,7 @@ def insert_db(classifi,class_name):
                 service = each['refinedScore3']
                 avgPrice = each['avgPrice']
                 address = each['address']
-                sql = 'INSERT INTO food_rank(class,class_id,classifi,rank_num,shopId,shopName,mainRegionName,taste,environment,service,avgPrice,city_id,address,update_time) ' \
+                sql = 'INSERT INTO food_rank(tip,tip_id,classifi,rank_num,shopId,shopName,mainRegionName,taste,environment,service,avgPrice,city_id,address,update_time) ' \
                       'VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
                 cursor.execute(sql, (class_name[i],
                                      i,
