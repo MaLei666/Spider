@@ -170,7 +170,7 @@ def get_shop_info():
             try:
                 res=verify_page(res_html,info_url)
                 # 小于1页的没有page元素，默认不爬取
-                pages=int(res_html.find(class_='reviews-pages').find_all('a')[-2].get_text())
+                pages=int(res.find(class_='reviews-pages').find_all('a')[-2].get_text())
                 # pages = int(res_html.xpath('//div[@class="reviews-pages"]/a[last()-1]/text()')[0])
                 # 如果返回的当前页码为0，即从未爬取过，或者为每次的新商户爬取。设置开始页码为2
                 if now_page==0:

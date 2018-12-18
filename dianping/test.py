@@ -29,21 +29,28 @@ def get_rewiew_info(text):
 
 
 from lxml import etree
-# text=open('test.txt',encoding='utf-8')
-# # text=etree.HTML(text.read())
-# texts=[]
-# soup=BeautifulSoup(text,'lxml')
-# soup=soup.find(text='验证中心')
+text=open('test.txt',encoding='utf-8')
+# text=etree.HTML(text.read())
+texts=[]
+soup=BeautifulSoup(text,'lxml')
+# soup=soup.find(text='很抱歉，您要访问的页面不存在')[0]
+# print(soup)
+
+# if soup.find(text='验证中心') or soup.find(text='很抱歉，您要访问的页面不存在'):
+#     # print(soup)
+#     print('需要验证\n')
+#     if input() == 1:
+#         print('验证成功')
+
+
 # for each in soup:
 #     a=each.get_text()[:-7]
 #     texts.append(a)
 # a=clear_text(texts)
-cookie_items=['cy=2; cye=beijing; _lxsdk_cuid=167b1995849c8-037c7551760f5d-10346654-13c680-167b199584ac8; _lxsdk=167b1995849c8-037c7551760f5d-10346654-13c680-167b199584ac8; _hc.v=e969b46d-7c06-6ddf-6814-7e3f42cf9d09.1544872876; dper=3b07bb25d232ef657f838755d674ec077d670ea2f0af420d657c27bdcc3ee0ddb978d5b8cbe918b29f492f939e933caf187d52888b9998d5f5f7e582b55d121f41f0346e2292fb322ff6f8407714921228578da028494ee16c6177b6fc39a71b; ll=7fd06e815b796be3df069dec7836c3df; ua=18401570769; ctu=32a871c547f64c71bccbced43bc31805a46afbe091777a08193483f3403d66c0; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; _lxsdk_s=167b231a5e4-b7b-af0-4ec%7C%7C188']
-cookie_Data = {}
-for cookie in cookie_items:
-    cookie_Data[cookie['name']] = cookie['value']
-print(cookie_items)
-file = open('cookie.txt', 'w', encoding='utf-8')
-file.write(cookie_items[0]['value'])
-file.close()
+# cookie_items={'name': 'dper', 'value': '725ac95a9bd4cb990b26440742aa1fa5caed95e3cf2738c93a2ae1c6b9cb744c84c74fbb7894bf4a6e3516ec1d1f9d6ee448b8e42d5ffb2dd3f48e4f8c569237', 'path': '/', 'domain': '.dianping.com', 'secure': False, 'httpOnly': True, 'expiry': 1547777639}
+# conf.set('cookies','value',cookie_items['value'])
+# with open('conf.ini','w') as wr:
+#     conf.write(wr)
 
+pages=soup.find(class_='reviews-pages').find_all('a')[-2].get_text()
+print(pages)
