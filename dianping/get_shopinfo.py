@@ -49,18 +49,6 @@ def get_id():
     conn.close()
     return shopid_list,shopname_list,now_page,re_no
 
-def verify_page(soup):
-    # 判断是否为验证码页
-    # 后期添加tenserflow识别验证码，如果是滑动验证，模拟滑动
-    try:
-        if soup.find:
-            # print(soup)
-            print('需要验证\n')
-            if input() == 1:
-                print('验证成功')
-    except:
-        print('页面返回非评论页面')
-
 def create_shop_db():
     try:
         cursor, conn = connect_mysql()
@@ -83,6 +71,20 @@ def create_shop_db():
     except:
         print('创建失败')
 
+def verify_page(soup,url):
+    # 判断是否为验证码
+    # 后期添加tenserflow识别验证码，如果是滑动验证，模拟滑动
+    if soup.find(text='验证中心') or soup.find(text='很抱歉，您要访问的页面不存在'):
+        # print(soup)
+        print('需要验证\n')
+        if input() == 1:
+            print('验证成功')
+        res=request_set(url)
+        res=BeautifulSoup(res, 'lxml')
+        return res
+    else:
+        return soup
+
 def insert_review_info(reviews,recommends,review_times,shopid,shopname,page):
     cursor, conn = connect_mysql()
     update_time=dt.now()
@@ -99,7 +101,7 @@ def insert_review_info(reviews,recommends,review_times,shopid,shopname,page):
     cursor.close()
     conn.close()
 
-def get_review_info(res,page,re_no,shopid,shopname):
+def get_review_info(res,page,re_no,shopid,shopname,url):
     soup = BeautifulSoup(res, 'lxml')
     reviews = []
     recommends=[]
@@ -108,46 +110,41 @@ def get_review_info(res,page,re_no,shopid,shopname):
     begin_point=0
     if re_no!=0:
         begin_point=re_no+1
-    try:
-        if soup.find(text='验证中心')[0]:
-            # print(soup)
-            print('需要验证\n')
-            if input() == 1:
-                print('验证成功')
-    except:
-        try:
-            # 查找所有评论的标签
-            soup=soup.find(class_='reviews-items').ul.find_all('li',recursive=False)
-            soup=soup[begin_point:]
-            for i in soup:
-                i=BeautifulSoup(str(i),'lxml')
-                try:
-                    review = i.find_all(class_='review-words Hide')[0].get_text()[:-4]
-                except:
-                    review=i.find_all(class_='review-words')[0].get_text()
-                try:
-                    review_recommend = i.find_all('div', class_='review-recommend')[0].get_text()
-                    review_recommend=review_recommend.replace('\n',',').replace(' ','')[6:]
-                except:
-                    review_recommend='无推荐菜'
 
-                review_time = i.find_all('span', class_='time')[0].get_text()
-                reviews.append(review)
-                recommends.append(review_recommend)
-                review_times.append(review_time)
-            reviews = clear_text(reviews)
-            review_times=clear_text(review_times)
-            # 对time进行重新清洗
-            for time in review_times[:]:
-                clear_time=time[-15:]
-                review_times.append(clear_time[:-5]+' '+clear_time[-5:]+':00')
-                review_times.remove(time)
-            # print(reviews,recommends,review_times)
-            insert_review_info(reviews,recommends,review_times,shopid,shopname,page)
-            print('爬取{}第{}页成功'.format(shopname,page))
-            return page
-        except:
-            print('页面爬取失败')
+    try:
+        soup=verify_page(soup,url)
+        # 查找所有评论的标签
+        soup=soup.find(class_='reviews-items').ul.find_all('li',recursive=False)
+        soup=soup[begin_point:]
+        for i in soup:
+            i=BeautifulSoup(str(i),'lxml')
+            try:
+                review = i.find_all(class_='review-words Hide')[0].get_text()[:-4]
+            except:
+                review=i.find_all(class_='review-words')[0].get_text()
+            try:
+                review_recommend = i.find_all('div', class_='review-recommend')[0].get_text()
+                review_recommend=review_recommend.replace('\n',',').replace(' ','')[6:]
+            except:
+                review_recommend='无推荐菜'
+
+            review_time = i.find_all('span', class_='time')[0].get_text()
+            reviews.append(review)
+            recommends.append(review_recommend)
+            review_times.append(review_time)
+        reviews = clear_text(reviews)
+        review_times=clear_text(review_times)
+        # 对time进行重新清洗
+        for time in review_times[:]:
+            clear_time=time[-15:]
+            review_times.append(clear_time[:-5]+' '+clear_time[-5:]+':00')
+            review_times.remove(time)
+        # print(reviews,recommends,review_times)
+        insert_review_info(reviews,recommends,review_times,shopid,shopname,page)
+        print('爬取{}第{}页成功'.format(shopname,page))
+        return page
+    except:
+        print('页面爬取失败')
 
 def get_shop_info():
     create_shop_db()
@@ -161,7 +158,8 @@ def get_shop_info():
         info_url=base_url+shopid_list[i]+'/review_all'
         try:
             res=request_set(info_url)
-            res_html = etree.HTML(res)
+            # res_html = etree.HTML(res)
+            res_html=BeautifulSoup(res,'lxml')
             # good_count = res.xpath('//label[@class="filter-item filter-good"]/span/text()')[0][1:-1]
             # middle_count = res.xpath('//label[@class="filter-item filter-middle"]/span/text()')[0][1:-1]
             # bad_count = res.xpath('//label[@class="filter-item filter-bad"]/span/text()')[0][1:-1]
@@ -170,14 +168,16 @@ def get_shop_info():
             # tags=clear_text(tags)
             # print(good_count,middle_count,bad_count,re_num,pages,tags)
             try:
+                res=verify_page(res_html,info_url)
                 # 小于1页的没有page元素，默认不爬取
-                pages = int(res_html.xpath('//div[@class="reviews-pages"]/a[last()-1]/text()')[0])
+                pages=int(res_html.find(class_='reviews-pages').find_all('a')[-2].get_text())
+                # pages = int(res_html.xpath('//div[@class="reviews-pages"]/a[last()-1]/text()')[0])
                 # 如果返回的当前页码为0，即从未爬取过，或者为每次的新商户爬取。设置开始页码为2
                 if now_page==0:
                     begin_page=2
                     # 爬取第一页
                     try:
-                        get_review_info(res, 1, 0, shopid_list[i], shopname_list[i])
+                        get_review_info(res, 1, 0, shopid_list[i], shopname_list[i],info_url)
                     except:
                         break
                 # 如果返回的当前页码不为0，即存在断点，从断点处续爬
@@ -191,7 +191,7 @@ def get_shop_info():
                             review_url = info_url + '/p' + str(page)
                             # print(review_url)
                             res = request_set(review_url)
-                            page=get_review_info(res, page, re_no,shopid_list[i], shopname_list[i])
+                            page=get_review_info(res, page, re_no,shopid_list[i], shopname_list[i],info_url)
                             begin_page=page+1
                         print('爬取{}店铺成功'.format(shopname_list[i]))
                     except:
@@ -203,14 +203,12 @@ def get_shop_info():
                         re_no=0
             except:
                 print('店铺评论小于一页，跳过爬取')
+                break
         except:
+            print('请求失败')
             break
-    while SystemExit or KeyboardInterrupt:
-        break
-
-try:
-    while True:
-        get_shop_info()
-except (KeyboardInterrupt, SystemExit):
     print('爬取结束')
+
+get_shop_info()
+
 
