@@ -10,8 +10,11 @@ from time import sleep
 # from fake_useragent import UserAgent
 # ua = UserAgent(use_cache_server=False,verify_ssl=False)
 
+conf = ConfigParser()
+conf.read('conf.ini')
+
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
-           'Cookie': 'dper=3b07bb25d232ef657f838755d674ec07b30d92b1b823317ef4c47b967141ff58c17b488c5e5a8aae933965adc39454897708fb4dff9d13b4f5169935ad936f6a61fa532c42edb595ad32bc854c5952d4612d10e9c59ee868c7da1197e3c2f0a8',
+           'Cookie': '{}={}'.format(conf.get('cookies','name'),conf.get('cookies','value')),
            'Referer': 'http://www.dianping.com/shop/102474045/review_all',
            'Connection': 'keep-alive',
            'Host': 'www.dianping.com',
@@ -59,7 +62,6 @@ def clear_text(input):
         input.remove('')
     return input
 
-list1=['']
 
 # request请求设置
 def request_set(req_url):
@@ -78,7 +80,6 @@ def browser_set():
     options.add_argument('--headless')
     # options.add_argument('--disable-gpu')
     browser=webdriver.Firefox(options=options)
-    return browser
 
     # 设置代理
     # service_args = [
@@ -95,12 +96,11 @@ def browser_set():
     # browser=webdriver.Chrome(options=options)
 
     # PhantomJS
+    # from selenium.webdriver import DesiredCapabilities
     # user_Agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
     # dcap = dict(DesiredCapabilities.PHANTOMJS)
     # dcap["phantomjs.page.settings.userAgent"] = user_Agent
-    # browser=webdriver.PhantomJS(desired_capabilities=dcap,service_args=service_args)
+    # browser=webdriver.PhantomJS(desired_capabilities=dcap)
+    return browser
 
 
-
-conf = ConfigParser()
-conf.read('conf.ini')
