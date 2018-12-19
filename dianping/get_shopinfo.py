@@ -119,7 +119,7 @@ def get_review_info(res,page,re_no,shopid,shopname,url):
         for i in soup:
             i=BeautifulSoup(str(i),'lxml')
             try:
-                review = i.find_all(class_='review-words Hide')[0].get_text()[:-4]
+                review = i.find_all(class_='review-words Hide')[0].get_text()[:-7]
             except:
                 review=i.find_all(class_='review-words')[0].get_text()
             try:
