@@ -11,7 +11,7 @@ from time import sleep
 # ua = UserAgent(use_cache_server=False,verify_ssl=False)
 
 conf = ConfigParser()
-conf.read('/home/py_code/spider/dianping/conf.ini')
+conf.read('conf.ini')
 
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
            'Cookie': '{}={}'.format(conf.get('cookies','name'),conf.get('cookies','value')),
@@ -55,7 +55,9 @@ def clear_text(input):
         re_each = re.sub(' +', '', re_each)
         re_each = re.sub('\t+', '', re_each)
         re_each = re.sub('\xa0', '', re_each)
+        re_each = re.sub(r'[^\u4e00-\u9fa5]', '', re_each)
         re_each = remove_emoji(re_each)
+        re_each = re.sub('收起评论', '', re_each)
         input.append(re_each)
         input.remove(each)
     while '' in input:
