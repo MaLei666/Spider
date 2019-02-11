@@ -14,6 +14,7 @@ from sklearn.metrics import roc_auc_score, f1_score
 from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
 
+
 # data = pd.read_csv('data.csv')
 # data.head()
 #构建label值
@@ -27,3 +28,22 @@ def zhuanhuan(score):
 
 # data['target'] = data['stars'].map(lambda x:zhuanhuan(x))
 # data_model = data.dropna()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

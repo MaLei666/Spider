@@ -44,7 +44,10 @@ data['target'] = data['stars'].map(lambda x:zhuanhuan(x))
 data_model = data.dropna()
 
 # ### 文本特征处理
-# 中文文本特征处理，需要进行中文分词，jieba分词库简单好用。接下来需要过滤停用词，网上能够搜到现成的。最后就要进行文本转向量，有词库表示法、TF-IDF、word2vec等，这篇文章作了详细介绍，推荐一波 https://zhuanlan.zhihu.com/p/44917421
+# 中文文本特征处理，需要进行中文分词，jieba分词库简单好用。
+# 接下来需要过滤停用词，网上能够搜到现成的。
+# 最后就要进行文本转向量，有词库表示法、TF-IDF、word2vec等，
+# 这篇文章作了详细介绍，推荐一波 https://zhuanlan.zhihu.com/p/44917421
 # 这里我们使用sklearn库的TF-IDF工具进行文本特征提取。
 #切分测试集、训练集
 from sklearn.model_selection import train_test_split
@@ -70,7 +73,8 @@ tv.fit(x_train)
 # 而且朴素贝叶斯算法的计算量较少。特征值是评论文本经过TF-IDF处理的向量，标签值评论的分类共两类，
 # 好评是1，差评是0。情感评分为分类器预测分类1的概率值。
 #计算分类效果的准确率
-
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import roc_auc_score, f1_score
 classifier = MultinomialNB()
 classifier.fit(tv.transform(x_train), y_train)
 classifier.score(tv.transform(x_test), y_test)
@@ -86,13 +90,13 @@ def ceshi(model,strings):
     return float(model.predict_proba(tv.transform(strings_fenci))[:,1])
 
 #从大众点评网找两条评论来测试一下
-test1 = '很好吃，环境好，所有员工的态度都很好，上菜快，服务也很好，味道好吃，都是用蒸馏水煮的，推荐，超好吃' #5星好评
-test2 = '糯米外皮不绵滑，豆沙馅粗躁，没有香甜味。12元一碗不值。' #1星差评
-print('好评实例的模型预测情感得分为{}\n差评实例的模型预测情感得分为{}'.format(ceshi(classifier,test1),ceshi(classifier,test2)))
+# test1 = '很好吃，环境好，所有员工的态度都很好，上菜快，服务也很好，味道好吃，都是用蒸馏水煮的，推荐，超好吃' #5星好评
+# test2 = '糯米外皮不绵滑，豆沙馅粗躁，没有香甜味。12元一碗不值。' #1星差评
+# print('好评实例的模型预测情感得分为{}\n差评实例的模型预测情感得分为{}'.format(ceshi(classifier,test1),ceshi(classifier,test2)))
 
 # 可以看出，准确率和AUC值都非常不错的样子，但点评网上的实际测试中，
 # 5星好评模型预测出来了，1星差评缺预测错误。为什么呢？我们查看一下**混淆矩阵**
-
+from sklearn.metrics import confusion_matrix
 y_predict = classifier.predict(tv.transform(x_test))
 cm = confusion_matrix(y_test, y_predict)
 
@@ -116,14 +120,13 @@ clf2.fit(tv.transform(x_train2), y_train2)
 y_pred2 = clf2.predict_proba(tv.transform(x_test))[:,1]
 roc_auc_score(y_test,y_pred2)
 
-
 #查看此时的混淆矩阵
-y_predict2 = clf2.predict(tv.transform(x_test))
-cm = confusion_matrix(y_test, y_predict2)
+# y_predict2 = clf2.predict(tv.transform(x_test))
+# cm = confusion_matrix(y_test, y_predict2)
 
 # 可以看出，即使是简单粗暴的复制样本来处理样本不平衡问题，负样本的识别率大幅上升了，变为77%，满满的幸福感呀~我们自己写两句评语来看看
 
-ceshi(clf2,'排队人太多，环境不好，口味一般')
+# ceshi(clf2,'排队人太多，环境不好，口味一般')
 
 # 可以看出把0类别的识别出来了，太棒了~
 # ### 过采样（SMOTE算法）
@@ -132,32 +135,32 @@ ceshi(clf2,'排队人太多，环境不好，口味一般')
 
 #使用SMOTE进行样本过采样处理
 from imblearn.over_sampling import SMOTE
-oversampler=SMOTE(random_state=0)
-x_train_vec = tv.transform(x_train)
-x_resampled, y_resampled = oversampler.fit_sample(x_train_vec, y_train)
-
-#原始的样本分布
-y_train.value_counts()
-
-#经过SMOTE算法过采样后的样本分布情况
-pd.Series(y_resampled).value_counts()
+# oversampler=SMOTE(random_state=0)
+# x_train_vec = tv.transform(x_train)
+# x_resampled, y_resampled = oversampler.fit_sample(x_train_vec, y_train)
+#
+# #原始的样本分布
+# y_train.value_counts()
+#
+# #经过SMOTE算法过采样后的样本分布情况
+# pd.Series(y_resampled).value_counts()
 
 
 # 我们经过插值，把0类数据也丰富为14923个数据了，这时候正负样本的比例为1:1，接下来我们用平衡后的数据进行训练，效果如何呢，好期待啊~
 
 #使用过采样样本(SMOTE)进行模型训练，并查看准确率
-clf3 = MultinomialNB()
-clf3.fit(x_resampled, y_resampled)
-y_pred3 = clf3.predict_proba(tv.transform(x_test))[:,1]
-roc_auc_score(y_test,y_pred3)
+# clf3 = MultinomialNB()
+# clf3.fit(x_resampled, y_resampled)
+# y_pred3 = clf3.predict_proba(tv.transform(x_test))[:,1]
+# roc_auc_score(y_test,y_pred3)
 
 #查看此时的准确率
-y_predict3 = clf3.predict(tv.transform(x_test))
-cm = confusion_matrix(y_test, y_predict3)
-
-#到网上找一条差评来测试一下情感评分的预测效果
-test3 = '糯米外皮不绵滑，豆沙馅粗躁，没有香甜味。12元一碗不值。'
-ceshi(clf3,test3)
+# y_predict3 = clf3.predict(tv.transform(x_test))
+# cm = confusion_matrix(y_test, y_predict3)
+#
+# #到网上找一条差评来测试一下情感评分的预测效果
+# test3 = '糯米外皮不绵滑，豆沙馅粗躁，没有香甜味。12元一碗不值。'
+# ceshi(clf3,test3)
 # 可以看出，使用SMOTE插值与简单的数据复制比起来，AUC率略有提高，实际预测效果也挺好
 # ### 模型评估测试
 # 接下来我们把3W条数据都拿来训练，数据量变多了，模型效果应该会更好
@@ -179,8 +182,8 @@ def fenxi(strings):
     strings_fenci = fenci(pd.Series([strings]))
     return float(clf.predict_proba(tv2.transform(strings_fenci))[:,1])
 
-#到网上找一条差评来测试一下
-fenxi('糯米外皮不绵滑，豆沙馅粗躁，没有香甜味。12元一碗不值。')
+a=fenxi('你奶奶个腿儿')
+print(a)
 
 # 只用到了简单的机器学习，就做出了不错的情感分析效果，知识的力量真是强大呀，666~
 # ### 后续优化方向
