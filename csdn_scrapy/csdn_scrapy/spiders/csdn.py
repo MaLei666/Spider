@@ -10,7 +10,7 @@ class comicspider(scrapy.Spider):
     # 用于区别Spider。该名字必须是唯一的，不可以为不同的Spider设定相同的名字。
     name = 'csdn.com'
     # 允许爬虫访问的域名，防止爬虫跑飞
-    allowed_domains=['www.csdn.net']
+    allowed_domains=['csdn.net']
     # start_urls:包含了Spider在启动时进行爬取的url列表。 第一个被获取到的页面将是其中之一。 后续的URL则从初始的URL获取到的数据中提取。
     start_urls=['https://www.csdn.net']
 
@@ -59,7 +59,7 @@ class comicspider(scrapy.Spider):
         item=response.meta['item']
         item['url']=response.url
         hxs=Selector(response)
-        texts=hxs.xpath("//div[@id='article_content']//text()").extract()
+        texts=hxs.xpath("//div[@id='article_content']//text()").get(default='not-found')
         turn = []
         text=''
         for each in texts:
@@ -84,10 +84,5 @@ class comicspider(scrapy.Spider):
         # input = input.decode('ascii', 'igone')
         # input = re.sub('\[[0-9]*\]', "", input)
         return input
-
-
-
-
-
 
 
